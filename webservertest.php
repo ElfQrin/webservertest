@@ -1,18 +1,17 @@
 <?
+$page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.0 r2016-10-04 fr2016-10-01
+# v1.2 r2016-11-03 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
 # Configuration
 
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
-$timg=true; # Show test image
-$tphpinfo=false; # Show PHPinfo
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'diskspace'=>true, 'file'=>true); # Server: Test/Show Host Name, IP address, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, disk space, test file (create, write, read, delete).
+$tsts=array('host'=>true, 'ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
@@ -26,7 +25,7 @@ $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between clie
 
 $ldf=200000; # Low disk free space (in bytes)
 
-$tfile='/var/www/html/data/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
+$tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - http://labs.geody.com/'; # Data to be written into the test file (up to 1024 bytes)
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
@@ -74,6 +73,38 @@ if (preg_match('/mobile/i', $user_agent)) {$browser.=' ('.'Mobile'.')';}
 return $browser;
 }
 
+function StringProgressBarLine($s1='',$s2='',$s3='',$valx=50,$valmax=100,$valwarn=10,$sl=300,$coltot='#888888',$colused='#448eeb',$colfree='#00ff00',$colnwarn='#efae25',$colwarn='#ff1111') {
+$xpos1=round($valx*$sl/$valmax);
+$xpos2=$sl-$xpos1;
+if ($xpos1<2) {$xpos1=2;}
+if ($xpos2<2) {$xpos2=2;}
+if ($valx<$valwarn) {
+$colusedd=$colwarn;
+} elseif ($valx<$valwarn*2) {
+$colusedd=$colnwarn;
+} else {
+$colusedd=$colfree;
+}
+if ($s1=='' && $s2=='' && $s3=='') {
+/*
+$xpc=round($valx*100/$valmax);
+$s1='Tot.: '.'100'.'%';
+$s2='Used: '.(100-$xpc).'%';
+$s3='Free: '.$xpc.'%';
+$notxt=false; $seth='';
+*/
+$notxt=true; $seth='height: 3px; ';
+} else {$notxt=false; $seth='';}
+$in=1;
+if (${'s'.$in}=='' && !$notxt) {$strp=' ';} else {$strp=${'s'.$in};}
+echo '<div style="border-bottom: 2px '.$coltot.' solid; '.$seth.'width: '.$sl.'px; overflow:visible;"><nobr>'.$strp.'</nobr></div>';
+$in++;
+if (${'s'.$in}=='' && !$notxt) {$strp=' ';} else {$strp=${'s'.$in};}
+echo '<div style="border-bottom: 2px '.$colused.' solid; '.$seth.'width: '.$xpos2.'px; overflow:visible;"><nobr>'.$strp.'</nobr></div>';
+$in++;
+if (${'s'.$in}=='' && !$notxt) {$strp=' ';} else {$strp=${'s'.$in};}
+echo '<div style="border-bottom: 2px '.$colusedd.' solid; '.$seth.'width: '.$xpos1.'px; overflow:visible;"><nobr>'.$strp.'</nobr></div>';
+}
 
 # Set default, failproof, values
 $dbn=''; $dbxinfo='Untested'; $tfiler='Untested';
@@ -102,6 +133,7 @@ header("Expires: 0"); // Proxies
 <meta http-equiv="Expires" content="0" />
 <style type="text/css">
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
+.txtsml {font-size: 70%;}
 table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 90%; text-align: center; background-color: #ffffff;}
 table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 90%; text-align: left; background-color: #ffffff;}
 img.im1 {float: none; border: 0;}
@@ -146,13 +178,17 @@ echo '<table border="1" cellpadding="5" cellspacing="0"><tr><td align="center" c
 }
 ?>
 <strong>Web Server Test</strong><br /><br />
+<?
+if ($tsts['img']) {
+?>
 <img src="webservertestimg.png" alt="Test image not loaded" title="" border="0" class="im1" /><br /><br />
 <?
+}
 if ($oufmt==2 && ($tserver || $tclient)) {
 echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n";
 }
 
-# Requires functions_db.php (if $tsts['db']==true), webservertestimg.png (if $timg==true)
+# Requires functions_db.php (if $tsts['db']==true), webservertestimg.png (if $tsts['img']==true)
 
 if ($tserver) {
 
@@ -161,10 +197,10 @@ echo '<strong>'.'Server'.'</strong>'."<br />\n";
 if ($tsts['host']) {echo 'Host Name'.': '.$_SERVER['HTTP_HOST']."<br />\n";}
 if ($tsts['ip']) {echo 'IP address'.': '.$_SERVER['SERVER_ADDR']."<br />\n";}
 
-if ($tsts['dateu']) {echo 'Date'.': '.$jswarnsttime.gmdate('D d-M-Y H:i').' '.'UTC'.$jswarnentime."<br />\n";}
+if ($tsts['dateu']) {echo 'Date'.': '.$jswarnsttime.gmdate('D d-M-Y H:i:s').' '.'UTC'.$jswarnentime."<br />\n";}
 if ($tsts['datel']) {
 $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}
-echo 'Date'.': '.$jswarnsttime.date('D d-M-Y H:i').' '.'UTC'.$ntzsl.($ntzl/3600).' (local)'.$jswarnentime."<br />\n";
+echo 'Date'.': '.$jswarnsttime.date('D d-M-Y H:i:s').' '.'UTC'.$ntzsl.($ntzl/3600).' (local)'.$jswarnentime."<br />\n";
 }
 
 if ($tsts['os']) {echo 'Web Server OS'.': '.PHP_OS."<br />\n";}
@@ -203,12 +239,15 @@ echo "<br />\n";
 }
 }
 
-if ($tsts['diskspace']) {
-$ds=disk_total_space('/');
+if ($tsts['diskspace'] || $tsts['diskspacebar']) {
+$ds=disk_total_space('/'); $dso=$ds;
 $df=disk_free_space('/'); $dfo=$df;
-$dfp=sprintf('%1.2f',$df*100/$ds);
-$du=$ds-$df; $dup=100-$dfp;
+$dfp=sprintf('%1.2f',$df*100/$ds); $dup=100-$dfp;
+$du=$ds-$df; $duo=$du;
 if ($dsfmt==2) {$ds=hrsize($ds); $df=hrsize($df); $du=hrsize($du);}
+}
+
+if ($tsts['diskspace']) {
 echo 'Disk Space'.': ';
 echo 'Tot.'.': '.$ds.', ';
 if ($dfo<$ldf) {echo $msgstwarn;}
@@ -217,6 +256,11 @@ if ($dfo<$ldf) {echo $msgenwarn;}
 echo ', ';
 echo 'Used'.': '.$du.' ('.$dup.'%'.')'.'.';
 echo "<br />\n";
+}
+
+if ($tsts['diskspacebar']) {
+StringProgressBarLine('','','',$dfo,$dso,$ldf);
+# echo "<br />\n";
 }
 
 if ($tsts['file']) {
@@ -261,7 +305,8 @@ var nyyu=ndateObj.getUTCFullYear();
 var ndwu=ndateObj.getUTCDay();
 var nhhu=ndateObj.getUTCHours();
 var nmnu=ndateObj.getUTCMinutes();
-document.writeln("Date"+": "+wrntst+dwds[ndwu]+" "+npadf2(nddu,2)+"-"+dmms[nmmu]+"-"+nyyu+" "+npadf2(nhhu,2)+":"+npadf2(nmnu,2)+" "+"UTC"+wrnten+"<br />");
+var nssu=ndateObj.getUTCSeconds();
+document.writeln("Date"+": "+wrntst+dwds[ndwu]+" "+npadf2(nddu,2)+"-"+dmms[nmmu]+"-"+nyyu+" "+npadf2(nhhu,2)+":"+npadf2(nmnu,2)+":"+npadf2(nssu,2)+" "+"UTC"+wrnten+"<br />");
 <? } ?>
 
 <? if ($tstc['datel']) { ?>
@@ -271,9 +316,10 @@ var nyyl=ndateObj.getFullYear();
 var ndwl=ndateObj.getDay();
 var nhhl=ndateObj.getHours();
 var nmnl=ndateObj.getMinutes();
+var nssl=ndateObj.getSeconds();
 var ntzl=ndateObj.getTimezoneOffset(); ntzl*=-1;
 if (ntzl>0) {var ntzsl="+";} else {var ntzsl="";}
-document.writeln("Date"+": "+wrntst+dwds[ndwl]+" "+npadf2(nddl,2)+"-"+dmms[nmml]+"-"+nyyl+" "+npadf2(nhhl,2)+":"+npadf2(nmnl,2)+" UTC"+ntzsl+""+(ntzl/60)+" "+"("+"local"+")"+wrnten+"<br />");
+document.writeln("Date"+": "+wrntst+dwds[ndwl]+" "+npadf2(nddl,2)+"-"+dmms[nmml]+"-"+nyyl+" "+npadf2(nhhl,2)+":"+npadf2(nmnl,2)+":"+npadf2(nssl,2)+" UTC"+ntzsl+""+(ntzl/60)+" "+"("+"local"+")"+wrnten+"<br />");
 <? } ?>
 
 <? if ($tstc['os']) { ?>document.writeln("Client OS"+": "+"<? echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<? } ?>
@@ -300,9 +346,9 @@ echo '</td></tr></table>'."\n";
 if ($logen) {
 $oul=$logentst; $itm=0;
 if ($logem['shost']) {$oul.=$logqs1.addslashes($_SERVER['HTTP_HOST']).$logqs2; $itm++;}
-if ($logem['sip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_ADDR']).$logqs2; $itm++;}
-if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i')).' '.'UTC'.$logqs2; $itm++;}
-if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
+if ($logem['sip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPS'.' '.$_SERVER['SERVER_ADDR']).$logqs2; $itm++;}
+if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i:s')).' '.'UTC'.$logqs2; $itm++;}
+if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i:s')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
 if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(PHP_OS).$logqs2; $itm++;}
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
@@ -315,7 +361,7 @@ if ($logem['sdiskf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes
 if ($logem['sdisku']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('DU'.' '.$du).$logqs2; $itm++;}
 }
 if ($logem['sfile']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('File'.' '.$tfiler).$logqs2; $itm++;}
-if ($logem['cip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['REMOTE_ADDR']).$logqs2; $itm++;}
+if ($logem['cip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPC'.' '.$_SERVER['REMOTE_ADDR']).$logqs2; $itm++;}
 if ($logem['cos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($user_os).$logqs2; $itm++;}
 if ($logem['cbrowser']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($user_browser).$logqs2; $itm++;}
 if ($logem['cuagent']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['HTTP_USER_AGENT']).$logqs2; $itm++;}
@@ -332,10 +378,17 @@ fclose($fob);
 ?>
 </div>
 <?
-if ($tphpinfo) {
+if ($tsts['phpinfo']) {
 echo '<div name="extra" id="extra">';
 phpinfo();
 echo '</div>';
+}
+
+if ($tsts['gentime']) {
+$page_end_time=microtime(true);
+$page_time_gen=round($page_end_time-$page_start_time,5);
+
+echo '<span class="txtsml">'.'Page generated in'.' '.$page_time_gen.' '.'seconds'.'.'.'</span>';
 }
 ?>
 </body>
