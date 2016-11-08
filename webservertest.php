@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.2 r2016-11-03 fr2016-10-01
+# v1.2.1 r2016-11-05 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
@@ -22,7 +22,7 @@ $db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Pa
 $db_name=''; # You can leave this empty
 
 $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between client and server
-
+$mxtimepgen=.02; # Maximum acceptable time (in seconds) to generate the page
 $ldf=200000; # Low disk free space (in bytes)
 
 $tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
@@ -388,7 +388,11 @@ if ($tsts['gentime']) {
 $page_end_time=microtime(true);
 $page_time_gen=round($page_end_time-$page_start_time,5);
 
-echo '<span class="txtsml">'.'Page generated in'.' '.$page_time_gen.' '.'seconds'.'.'.'</span>';
+echo '<span class="txtsml">';
+if ($page_time_gen>$mxtimepgen) {echo $msgstwarn;}
+echo 'Page generated in'.' '.$page_time_gen.' '.'seconds'.'.';
+if ($page_time_gen>$mxtimepgen) {echo $msgenwarn;}
+echo '</span>';
 }
 ?>
 </body>
