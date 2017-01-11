@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.2.1 r2016-11-05 fr2016-10-01
+# v1.2.2 r2017-01-11 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
@@ -134,8 +134,8 @@ header("Expires: 0"); // Proxies
 <style type="text/css">
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
 .txtsml {font-size: 70%;}
-table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 90%; text-align: center; background-color: #ffffff;}
-table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 90%; text-align: left; background-color: #ffffff;}
+table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: center; background-color: #ffffff;}
+table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: left; background-color: #ffffff;}
 img.im1 {float: none; border: 0;}
 </style>
 </head>
@@ -203,7 +203,7 @@ $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}
 echo 'Date'.': '.$jswarnsttime.date('D d-M-Y H:i:s').' '.'UTC'.$ntzsl.($ntzl/3600).' (local)'.$jswarnentime."<br />\n";
 }
 
-if ($tsts['os']) {echo 'Web Server OS'.': '.PHP_OS."<br />\n";}
+if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
 if ($tsts['webserversoft']) {echo 'Web Server Software'.': '.$_SERVER['SERVER_SOFTWARE']."<br />\n";}
 if ($tsts['php']) {
 echo 'PHP'.': '.'Running';
@@ -349,7 +349,7 @@ if ($logem['shost']) {$oul.=$logqs1.addslashes($_SERVER['HTTP_HOST']).$logqs2; $
 if ($logem['sip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPS'.' '.$_SERVER['SERVER_ADDR']).$logqs2; $itm++;}
 if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i:s')).' '.'UTC'.$logqs2; $itm++;}
 if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i:s')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
-if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(PHP_OS).$logqs2; $itm++;}
+if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
 if ($logem['sdb']) {if ($itm>0) {$oul.=$logitmsep;}; if ($dbxinfo=='') {$dbxinfo='FAILED';}; $oul.=$logqs1.addslashes('DB'.' '.$dbn.' '.$dbxinfo).$logqs2; $itm++;}

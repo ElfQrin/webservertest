@@ -1,5 +1,10 @@
 <?
 
+# DBX Wrapper: MySQL, MySQLi, PostgreSQL, SQLite
+# By Valerio Capello ( http://labs.geody.com/ ) r2016-12-10 fr2016-09-21
+# License: GPL v3.0
+
+
 # Functions
 
 function explodex($s,$nx='.',$ord=0,$mod=false) {
@@ -44,11 +49,14 @@ $db_host_1=explodex($db_host,':',0,true);
 if ($db_host_1[1]!==false) {$db_portz=' port='.$db_host_1[1].' ';} else {$db_portz=' ';}
 $r=pg_connect("host=".$db_host_1[0].$db_portz."dbname=".$db_name." user=".$db_user." password=".$db_pwd);
 break;
+case 'sqlite':
+$r=sqlite_open($db_host); # $db_host contains the file name of the SQLite Database
+break;
 }
 return $r;
 }
 
-function dbx_connect_pt($dbx,$db_host,$db_port,$db_user,$db_pwd,$db_name='') {
+function dbx_connect_pt($dbx,$db_host,$db_port=false,$db_user,$db_pwd,$db_name='') {
 $dbx=strtolower(trim($dbx));
 if ($db_port!==false) {
 $r=dbx_connect($dbx,$db_host.':'.$db_port,$db_user,$db_pwd,$db_name);
@@ -70,6 +78,9 @@ break;
 case 'postgresql':
 pg_close($dbxcon);
 break;
+case 'sqlite':
+sqlite_close($dbxcon);
+break;
 }
 }
 
@@ -86,6 +97,9 @@ break;
 case 'postgresql':
 # $dbxcon=pg_connect("dbname=".$db_name);
 $r=pg_query($dbxcon,$dbq);
+break;
+case 'sqlite':
+$r=sqlite_query($dbxcon,$dbq);
 break;
 }
 return $r;
@@ -104,6 +118,9 @@ break;
 case 'postgresql':
 $r=pg_num_rows($dbo);
 break;
+case 'sqlite':
+$r=sqlite_num_rows($dbo);
+break;
 }
 return $r;
 }
@@ -120,6 +137,9 @@ $r=mysqli_fetch_array($dbo);
 break;
 case 'postgresql':
 $r=pg_fetch_array($dbo);
+break;
+case 'sqlite':
+$r=sqlite_fetch_array($dbo);
 break;
 }
 return $r;
@@ -138,6 +158,9 @@ break;
 case 'postgresql':
 $r=pg_fetch_object($dbo);
 break;
+case 'sqlite':
+$r=sqlite_fetch_object($dbo);
+break;
 }
 return $r;
 }
@@ -154,6 +177,9 @@ break;
 case 'postgresql':
 $r=pg_last_error($dbxcon);
 break;
+case 'sqlite':
+$r=sqlite_last_error($dbxcon);
+break;
 }
 return $r;
 }
@@ -169,6 +195,9 @@ $r=mysqli_get_server_info($dbxcon);
 break;
 case 'postgresql':
 $r=pg_version($dbxcon);
+break;
+case 'sqlite':
+$r=sqlite_libversion($dbxcon);
 break;
 }
 return $r;
