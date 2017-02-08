@@ -7,3 +7,6 @@ All warning messages are shown in red so that you can instantly realize there's 
 You can run it as a test page after the first installation of your webserver or use it as part of your daily routine. It shows nicely on desktop and mobile browsers. It is also scriptable (using wget or lynx) and can generate logs, so that you can include it in your crontab.
 
 http://labs.geody.com/webservertest/
+
+Screenshot:
+<img src="http://i.imgur.com/1LkF82C.png" alt="GeodyLabs Webserver Test screenshot" />
