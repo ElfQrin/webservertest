@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.2.2 r2017-01-11 fr2016-10-01
+# v1.2.3 r2017-07-25 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
@@ -29,7 +29,7 @@ $tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The 
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - http://labs.geody.com/'; # Data to be written into the test file (up to 1024 bytes)
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
-$logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
+$logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
 $logem=array('shost'=>true, 'sip'=>true, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, MySQL Version, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client OS, Client Browser, Client User Agent.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
@@ -203,6 +203,7 @@ $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}
 echo 'Date'.': '.$jswarnsttime.date('D d-M-Y H:i:s').' '.'UTC'.$ntzsl.($ntzl/3600).' (local)'.$jswarnentime."<br />\n";
 }
 
+# if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
 if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
 if ($tsts['webserversoft']) {echo 'Web Server Software'.': '.$_SERVER['SERVER_SOFTWARE']."<br />\n";}
 if ($tsts['php']) {
@@ -271,7 +272,7 @@ $fob=fopen($tfile,'wb'); if (!$fob) {echo $msgstwarn.'Cannot create test file'.$
 if ($do) {$fow=fwrite($fob,$tfilec); if (!$fow) {echo $msgstwarn.'Cannot write on test file'.$msgenwarn.'. '; $do=false;} else {echo 'Written'.', ';}}
 fclose($fob);
 if ($do) {$foa=fopen($tfile,'rb'); if (!$foa) {echo $msgstwarn.'Cannot open test file'.$msgenwarn.'. '; $do=false;} else {echo 'Opened'.', ';}}
-if ($do) {$data=fread($foa,1024); if ($tfilec!=$data) {echo $msgstwarn.'Data read from the file does not match the written data'.$msgenwarn.', '; $rmatch=false;} else {echo 'Read'.', '; $rmatch=true;}}
+if ($do) {$data=fread($foa,1024); if (!$data) {echo $msgstwarn.'Cannot read test file'.$msgenwarn.'. '; $do=false;} else {echo 'Read'.', '; if ($tfilec!=$data) {echo $msgstwarn.'Data read from the file does not match the written data'.$msgenwarn.', '; $rmatch=false;} else {echo 'Verified'.', '; $rmatch=true;}}}
 fclose($foa);
 if ($do) {$foad=unlink($tfile); if (!$foad) {echo $msgstwarn.'Cannot remove test file'.$msgenwarn.'. '; $do=false;} else {echo 'Removed'.'. ';}}
 if ($do && $rmatch) {echo 'Success!'; $tfiler='OK';} else {echo $msgstwarn.'FAILED!'.$msgenwarn; $tfiler='FAILED';}
@@ -349,6 +350,7 @@ if ($logem['shost']) {$oul.=$logqs1.addslashes($_SERVER['HTTP_HOST']).$logqs2; $
 if ($logem['sip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPS'.' '.$_SERVER['SERVER_ADDR']).$logqs2; $itm++;}
 if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i:s')).' '.'UTC'.$logqs2; $itm++;}
 if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i:s')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
+# if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
 if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
