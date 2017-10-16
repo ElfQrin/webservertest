@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.2.3 r2017-07-25 fr2016-10-01
+# v1.2.4 r2017-10-16 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
@@ -155,7 +155,6 @@ if (Math.abs(ctmst-stmst)><? echo $mxcstimediff; ?>) { var wrntst='<? echo $msgs
 </script>
 <?
 $jswarnsttime='
-<body bgcolor="#FFFFFF" text="#222222">
 <script language="JavaScript" type="text/javascript">
 <!--
 document.write(wrntst);
@@ -163,7 +162,6 @@ document.write(wrntst);
 </script>
 ';
 $jswarnentime='
-<body bgcolor="#FFFFFF" text="#222222">
 <script language="JavaScript" type="text/javascript">
 <!--
 document.write(wrnten);
