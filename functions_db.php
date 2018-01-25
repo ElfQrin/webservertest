@@ -1,7 +1,7 @@
 <?
 
 # DBX Wrapper: MySQL, MySQLi, PostgreSQL, SQLite
-# By Valerio Capello ( http://labs.geody.com/ ) r2017-09-11 fr2016-09-21
+# By Valerio Capello ( http://labs.geody.com/ ) r2018-01-23 fr2016-09-21
 # License: GPL v3.0
 
 
@@ -70,7 +70,7 @@ function dbx_close($dbx,$dbxcon) {
 $dbx=strtolower(trim($dbx));
 switch ($dbx) {
 case 'mysql':
-dbx_close($dbx,$dbxcon);
+mysql_close($dbxcon);
 break;
 case 'mysqli':
 mysqli_close($dbxcon);
