@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello ( http://labs.geody.com/ )
-# v1.2.4 r2017-10-16 fr2016-10-01
+# v1.2.5 r2018-01-27 fr2016-10-01
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
@@ -11,7 +11,7 @@ $page_start_time=microtime(true);
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
@@ -30,7 +30,7 @@ $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the q
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, MySQL Version, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client OS, Client Browser, Client User Agent.
+$logem=array('shost'=>true, 'sip'=>true, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, protocol Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client OS, Client Browser, Client User Agent.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes a log item
@@ -238,6 +238,13 @@ echo "<br />\n";
 }
 }
 
+if ($tsts['prot']) {
+echo 'Protocol'.': '.$_SERVER['SERVER_PROTOCOL'];
+echo ' - ';
+if ($_SERVER['HTTPS']) {echo 'Secure (HTTPS)';} else {echo 'NOT Secure';}
+echo "<br />\n";
+}
+
 if ($tsts['diskspace'] || $tsts['diskspacebar']) {
 $ds=disk_total_space('/'); $dso=$ds;
 $df=disk_free_space('/'); $dfo=$df;
@@ -353,6 +360,7 @@ if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(ph
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
 if ($logem['sdb']) {if ($itm>0) {$oul.=$logitmsep;}; if ($dbxinfo=='') {$dbxinfo='FAILED';}; $oul.=$logqs1.addslashes('DB'.' '.$dbn.' '.$dbxinfo).$logqs2; $itm++;}
+if ($logem['sprot']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('Protocol'.' '.$_SERVER['SERVER_PROTOCOL']); if ($_SERVER['HTTPS']) {$oul.=addslashes(' (HTTPS)');} else {$oul.=addslashes(' (HTTP)');}; $oul.=$logqs2; $itm++;}
 if ($logem['sdiskt'] || $logem['sdiskf'] || $logem['sdisku']) {
 $ds=disk_total_space('/'); $df=disk_free_space('/'); $du=$ds-$df;
 if ($dsfmtl==2) {$ds=hrsize($ds); $df=hrsize($df); $du=hrsize($du);}
