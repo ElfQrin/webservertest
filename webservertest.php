@@ -1,21 +1,24 @@
 <?
 $page_start_time=microtime(true);
 # Web Server Test
-# By Valerio Capello ( http://labs.geody.com/ )
-# v1.2.5 r2018-01-27 fr2016-10-01
+# By Valerio Capello (Elf Qrin) - http://labs.geody.com/
+# v1.2.6 r2018-12-28 fr2016-10-01
+
+# die(); # die unconditionately, locking out any access
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
+
 
 # Configuration
 
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
-$tstc=array('ip'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'browser'=>true, 'uagent'=>false); # Client: Test/Show IP address, Date (UTC), Date (Local), OS, browser. Note that information about the Client's OS and browser are gathered from the User Agent and may be forged.
+$tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'browser'=>true, 'uagent'=>false); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), OS, browser, User Agent. Note that information about the Client's OS and browser are gathered from the User Agent and may be forged.
 
 $dbx="mysqli"; # MySQL, MySQLi, PostgreSQL
 $db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Password
@@ -30,7 +33,7 @@ $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the q
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, protocol Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client OS, Client Browser, Client User Agent.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, protocol, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes a log item
@@ -109,8 +112,8 @@ echo '<div style="border-bottom: 2px '.$colusedd.' solid; '.$seth.'width: '.$xpo
 # Set default, failproof, values
 $dbn=''; $dbxinfo='Untested'; $tfiler='Untested';
 
-$user_os = getRemoteOS($_SERVER['HTTP_USER_AGENT']);
-$user_browser = getRemoteBrowser($_SERVER['HTTP_USER_AGENT']);
+$user_os = getRemoteOS(addslashes($_SERVER['HTTP_USER_AGENT']));
+$user_browser = getRemoteBrowser(addslashes($_SERVER['HTTP_USER_AGENT']));
 
 $dival="left"; if ($oufmt==2) {$dival='center';}
 
@@ -193,7 +196,12 @@ if ($tserver) {
 echo '<strong>'.'Server'.'</strong>'."<br />\n";
 
 if ($tsts['host']) {echo 'Host Name'.': '.$_SERVER['HTTP_HOST']."<br />\n";}
-if ($tsts['ip']) {echo 'IP address'.': '.$_SERVER['SERVER_ADDR']."<br />\n";}
+if ($tsts['ip'] || $tsts['port']) {
+if ($tsts['ip']) {echo 'IP address'.': '.$_SERVER['SERVER_ADDR'];}
+if ($tsts['port']) {if ($tsts['ip']) {echo ' ';}; echo 'Port'.': '.$_SERVER['SERVER_PORT'];}
+echo "<br />\n";
+}
+
 
 if ($tsts['dateu']) {echo 'Date'.': '.$jswarnsttime.gmdate('D d-M-Y H:i:s').' '.'UTC'.$jswarnentime."<br />\n";}
 if ($tsts['datel']) {
@@ -290,7 +298,11 @@ if ($tclient) {
 if ($tserver) {echo "<br />\n";}
 
 echo '<strong>'.'Client'.'</strong>'."<br />\n";
-if ($tstc['ip']) {echo 'IP address'.': '.$_SERVER['REMOTE_ADDR']."<br />\n";}
+if ($tstc['ip'] || $tstc['port']) {
+if ($tstc['ip']) {echo 'IP address'.': '.$_SERVER['REMOTE_ADDR'];}
+if ($tstc['port']) {if ($tstc['ip']) {echo ' ';}; echo 'Port'.': '.$_SERVER['REMOTE_PORT'];}
+echo "<br />\n";
+}
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -330,7 +342,7 @@ document.writeln("Date"+": "+wrntst+dwds[ndwl]+" "+npadf2(nddl,2)+"-"+dmms[nmml]
 
 <? if ($tstc['os']) { ?>document.writeln("Client OS"+": "+"<? echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<? } ?>
 <? if ($tstc['browser']) { ?>document.writeln("Browser"+": "+"<? echo $user_browser; ?>"+"<br />");<? } ?>
-<? if ($tstc['uagent']) { ?>document.writeln("User Agent"+": "+"<? echo $_SERVER['HTTP_USER_AGENT']; ?>"+"<br />");<? } ?>
+<? if ($tstc['uagent']) { ?>document.writeln("User Agent"+": "+"<? echo addslashes($_SERVER['HTTP_USER_AGENT']); ?>"+"<br />");<? } ?>
 
 document.writeln("JavaScript"+": "+"Enabled"+"<br />");
 // -->
@@ -353,6 +365,7 @@ if ($logen) {
 $oul=$logentst; $itm=0;
 if ($logem['shost']) {$oul.=$logqs1.addslashes($_SERVER['HTTP_HOST']).$logqs2; $itm++;}
 if ($logem['sip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPS'.' '.$_SERVER['SERVER_ADDR']).$logqs2; $itm++;}
+if ($logem['sport']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SPT'.' '.$_SERVER['SERVER_PORT']).$logqs2; $itm++;}
 if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i:s')).' '.'UTC'.$logqs2; $itm++;}
 if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i:s')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
 # if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
@@ -370,6 +383,7 @@ if ($logem['sdisku']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes
 }
 if ($logem['sfile']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('File'.' '.$tfiler).$logqs2; $itm++;}
 if ($logem['cip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPC'.' '.$_SERVER['REMOTE_ADDR']).$logqs2; $itm++;}
+if ($logem['cport']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PTC'.' '.$_SERVER['REMOTE_PORT']).$logqs2; $itm++;}
 if ($logem['cos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($user_os).$logqs2; $itm++;}
 if ($logem['cbrowser']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($user_browser).$logqs2; $itm++;}
 if ($logem['cuagent']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['HTTP_USER_AGENT']).$logqs2; $itm++;}
