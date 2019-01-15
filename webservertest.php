@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v1.2.6 r2018-12-28 fr2016-10-01
+# v1.3 r2019-01-15 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -41,8 +41,8 @@ $logqs2='"'; # Follows a log item
 $logentst=''; # Precedes a log entry
 $logenten="\n"; # Follows a log entry
 
-$msgstwarn='<span style="color: #ee0000;"><font color="#ee0000">'; # Start Warning Message
-$msgenwarn='</font></span>'; # End Warning Message
+$msgstwarn='<span class="warn">'; # Start Warning Message
+$msgenwarn='</span>'; # End Warning Message
 
 
 # Functions
@@ -60,7 +60,7 @@ foreach ($os_array as $regex => $value) {
 if (preg_match($regex, $user_agent)) {
 $os_platform = $value; break;
 }
-} 
+}
 return $os_platform;
 }
 
@@ -135,11 +135,28 @@ header("Expires: 0"); // Proxies
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <style type="text/css">
+/* Light Theme */
+
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
-.txtsml {font-size: 70%;}
 table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: center; background-color: #ffffff;}
 table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: left; background-color: #ffffff;}
+.warn {color: #ee0000;}
+
+
+/* Dark Theme */
+/*
+body {background-color: #0e0e0e; color: #efefef; font-family: Arial, Helvetica, sans-serif;}
+table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: center; background-color: #121212;}
+table.t2 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: left; background-color: #121212;}
+.warn {color: #ee5555;}
+*/
+
+/* More */
+
+h1 { display: block; font-size: 1.1em; margin-top: 1%; margin-bottom: 1%; margin-left: 0; margin-right: 0; font-weight: bold; }
+.txtsml {font-size: 70%;}
 img.im1 {float: none; border: 0;}
+
 </style>
 </head>
 <body bgcolor="#FFFFFF" text="#222222">
@@ -175,10 +192,10 @@ document.write(wrnten);
 <div name="main" id="main" align="<? echo $dival; ?>" style="text-align: <? echo $dival; ?>;">
 <?
 if ($oufmt==2) {
-echo '<table border="1" cellpadding="5" cellspacing="0"><tr><td align="center" class="t1">'."\n";
+echo '<table border="1" cellpadding="5" cellspacing="0" class="t1"><tr><td align="center">'."\n";
 }
 ?>
-<strong>Web Server Test</strong><br /><br />
+<h1>Web Server Test</h1><br />
 <?
 if ($tsts['img']) {
 ?>
@@ -190,6 +207,8 @@ echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n
 }
 
 # Requires functions_db.php (if $tsts['db']==true), webservertestimg.png (if $tsts['img']==true)
+
+# echo '['.$msgstwarn.'WARNING TEST'.$msgenwarn.']'."<br /><br />\n";
 
 if ($tserver) {
 
