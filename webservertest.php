@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v1.3 r2019-01-15 fr2016-10-01
+# v1.4 r2019-10-02 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -14,7 +14,7 @@ $page_start_time=microtime(true);
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
@@ -33,7 +33,7 @@ $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the q
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, protocol, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes a log item
@@ -265,6 +265,20 @@ echo "<br />\n";
 }
 }
 
+if ($tsts['ossl']) {
+$osslv=shell_exec('openssl version -v');
+if (strtolower(substr($osslv,0,8))==="openssl ") {$osslv=substr($osslv,strpos($osslv," ")+1);}
+echo 'OpenSSL: '.$osslv;
+echo "<br />\n";
+}
+
+if ($tsts['osslphp']) {
+$osslphpv=OPENSSL_VERSION_TEXT.' '.'('.OPENSSL_VERSION_NUMBER.')';
+if (strtolower(substr($osslphpv,0,8))==="openssl ") {$osslphpv=substr($osslphpv,strpos($osslphpv," ")+1);}
+echo 'OpenSSL (PHP): '.$osslphpv;
+echo "<br />\n";
+}
+
 if ($tsts['prot']) {
 echo 'Protocol'.': '.$_SERVER['SERVER_PROTOCOL'];
 echo ' - ';
@@ -392,6 +406,8 @@ if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(ph
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
 if ($logem['sdb']) {if ($itm>0) {$oul.=$logitmsep;}; if ($dbxinfo=='') {$dbxinfo='FAILED';}; $oul.=$logqs1.addslashes('DB'.' '.$dbn.' '.$dbxinfo).$logqs2; $itm++;}
+if ($logem['sossl']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSSL'.' '.$osslv).$logqs2; $itm++;}
+if ($logem['sosslphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSSL-PHP'.' '.$osslphpv).$logqs2; $itm++;}
 if ($logem['sprot']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('Protocol'.' '.$_SERVER['SERVER_PROTOCOL']); if ($_SERVER['HTTPS']) {$oul.=addslashes(' (HTTPS)');} else {$oul.=addslashes(' (HTTP)');}; $oul.=$logqs2; $itm++;}
 if ($logem['sdiskt'] || $logem['sdiskf'] || $logem['sdisku']) {
 $ds=disk_total_space('/'); $df=disk_free_space('/'); $du=$ds-$df;
