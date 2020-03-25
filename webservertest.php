@@ -2,11 +2,13 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v1.4 r2019-10-02 fr2016-10-01
+# v2.0 r2020-03-25 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
+
+if ($_GET['pwd']!='checkup'.'33') {die('unauthorized');} # Simple password protection
 
 
 # Configuration
@@ -14,25 +16,25 @@ $page_start_time=microtime(true);
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHPinfo, DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
 $tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'browser'=>true, 'uagent'=>false); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), OS, browser, User Agent. Note that information about the Client's OS and browser are gathered from the User Agent and may be forged.
 
 $dbx="mysqli"; # MySQL, MySQLi, PostgreSQL
-$db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Password
+$db_host='localhost'; $db_user='master'; $db_pwd='bramast93x2'; # DataBase Host, User name and Password
 $db_name=''; # You can leave this empty
 
 $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between client and server
-$mxtimepgen=.02; # Maximum acceptable time (in seconds) to generate the page
+$mxtimepgen=.5; # Maximum acceptable time (in seconds) to generate the page
 $ldf=200000; # Low disk free space (in bytes)
 
-$tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
+$tfile='/var/www/wwwdata/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - http://labs.geody.com/'; # Data to be written into the test file (up to 1024 bytes)
 
 $logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
-$logfile='/var/log/webservertest/webservertest.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
+$logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
 $logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
@@ -109,6 +111,70 @@ if (${'s'.$in}=='' && !$notxt) {$strp=' ';} else {$strp=${'s'.$in};}
 echo '<div style="border-bottom: 2px '.$colusedd.' solid; '.$seth.'width: '.$xpos1.'px; overflow:visible;"><nobr>'.$strp.'</nobr></div>';
 }
 
+function xcrypt($cipher='sodium',$mode=0,$msg,$key) {
+$cipher=strtolower(trim($cipher));
+$r='';
+switch ($cipher) {
+case 'clear':
+case 'cleartext':
+case 'cleartxt':
+$r=$msg;
+return $r;
+break;
+default:
+case 'sodium':
+if ($mode==0) {
+$nonce = random_bytes(SODIUM_CRYPTO_SECRETBOX_NONCEBYTES);
+$r = base64_encode($nonce.sodium_crypto_secretbox($msg, $nonce, $key));
+sodium_memzero($msg); sodium_memzero($key);
+return $r;
+} else {
+$decoded = base64_decode($msg);
+if ($decoded === false) {
+$r='*** ERROR: Encoding failed';
+sodium_memzero($msg); sodium_memzero($key);
+# throw new Exception($r);
+return $r;
+}
+if (mb_strlen($decoded, '8bit') < (SODIUM_CRYPTO_SECRETBOX_NONCEBYTES + SODIUM_CRYPTO_SECRETBOX_MACBYTES)) {
+$r='*** ERROR: Truncated message';
+sodium_memzero($msg); sodium_memzero($key);
+# throw new Exception($r);
+return $r;
+}
+$nonce = mb_substr($decoded, 0, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, '8bit');
+$decodedcipher = mb_substr($decoded, SODIUM_CRYPTO_SECRETBOX_NONCEBYTES, null, '8bit');
+$r = sodium_crypto_secretbox_open($decodedcipher, $nonce, $key);
+if ($r === false) {
+$r='*** ERROR: The message was tampered with in transit';
+sodium_memzero($msg); sodium_memzero($decodedcipher); sodium_memzero($key);
+# throw new Exception($r);
+return $r;
+}
+sodium_memzero($msg); sodium_memzero($decodedcipher); sodium_memzero($key);
+return $r;
+}
+break;
+case 'mcrypt':
+if ($mode==0) {
+$iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
+$crypt = mcrypt_encrypt(MCRYPT_RIJNDAEL_128, $key, $msg, MCRYPT_MODE_CBC, $iv);
+$combo = $iv.$crypt;
+$r = base64_encode($iv.$crypt);
+return $r;
+} else {
+$combo = base64_decode($msg);
+$iv = substr($combo, 0,  mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
+$crypt = substr($combo,  mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), strlen($combo));
+$r = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $crypt, MCRYPT_MODE_CBC, $iv);
+return $r;
+}
+break;
+}
+return $r;
+}
+
+
 # Set default, failproof, values
 $dbn=''; $dbxinfo='Untested'; $tfiler='Untested';
 
@@ -136,20 +202,20 @@ header("Expires: 0"); // Proxies
 <meta http-equiv="Expires" content="0" />
 <style type="text/css">
 /* Light Theme */
-
+/*
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: center; background-color: #ffffff;}
 table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: left; background-color: #ffffff;}
 .warn {color: #ee0000;}
-
+*/
 
 /* Dark Theme */
-/*
+
 body {background-color: #0e0e0e; color: #efefef; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: center; background-color: #121212;}
 table.t2 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: left; background-color: #121212;}
 .warn {color: #ee5555;}
-*/
+
 
 /* More */
 
@@ -199,7 +265,7 @@ echo '<table border="1" cellpadding="5" cellspacing="0" class="t1"><tr><td align
 <?
 if ($tsts['img']) {
 ?>
-<img src="webservertestimg.png" alt="Test image not loaded" title="" border="0" class="im1" /><br /><br />
+<img src="webservertestimg.png" alt="Test image not loaded" title="Test" border="0" class="im1" /><br /><br />
 <?
 }
 if ($oufmt==2 && ($tserver || $tclient)) {
@@ -233,15 +299,71 @@ if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('v').' 
 if ($tsts['webserversoft']) {echo 'Web Server Software'.': '.$_SERVER['SERVER_SOFTWARE']."<br />\n";}
 if ($tsts['php']) {
 echo 'PHP'.': '.'Running';
-echo '. '.'Version info'.': '.PHP_VERSION;
+echo '. '.'Version'.': '.PHP_VERSION;
 echo "<br />\n";
+
+if ($tsts['php_gd']) {
+echo 'PHP'.': '.'GD'.': ';
+if (extension_loaded('gd')) {echo 'loaded'.'. '.'Version'.': '.gd_info()['GD Version'].' '.'<img src="webservertestimg_gd.php" height="10" width="10" alt="PHP GD Test Image" title="PHP GD Test Image" border="0" />';} else {echo $msgstwarn.'NOT loaded'.$msgenwarn;}
+echo "<br />\n";
+}
+
+if ($tsts['php_imagick']) {
+echo 'PHP'.': '.'Imagick'.': ';
+if (extension_loaded('imagick')) {
+$phpimagickv=Imagick::getVersion();
+echo 'loaded'.'. '.'Version'.': <!-- '.$phpimagickv['versionString'].' --> '.$phpimagickv['versionNumber'].' '.'<img src="webservertestimg_imagick.php" height="10" width="10" alt="PHP Imagick Test Image" title="PHP Imagick Test Image" border="0" />';
+} else {echo $msgstwarn.'NOT loaded'.$msgenwarn;}
+echo "<br />\n";
+}
+
+if ($tsts['php_mbstring']) {
+echo 'PHP'.': '.'mbstring'.': ';
+if (extension_loaded('mbstring')) {echo 'loaded';} else {echo $msgstwarn.'NOT loaded'.$msgenwarn;}
+echo '.'."<br />\n";
+}
+
+if ($tsts['php_sodium']) {
+echo 'PHP'.': '.'Sodium'.': ';
+if (extension_loaded('sodium')) {
+echo 'loaded'.'. ';
+if (extension_loaded('mbstring')) {
+$txtplain='Test OK';
+$keyenc=random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES);
+# echo ' ('.'Key (Hex)'.': '.bin2hex($keyenc).') '; # hex2bin(bin2hex($keyenc))
+$txtenc=xcrypt('sodium',0,$txtplain,$keyenc);
+# echo ' ('.'Sodium (ENC): '.$txtenc.') ';
+$txtdec=xcrypt('sodium',1,$txtenc,$keyenc);
+echo $txtdec;
+} else {
+echo ', '.'but mbstring extension (required for the test) is missing.';
+}
+} else {echo $msgstwarn.'NOT loaded'.$msgenwarn;}
+echo "<br />\n";
+}
+
+if ($tsts['php_mcrypt']) {
+echo 'PHP'.': '.'mcrypt'.': ';
+if (extension_loaded('mcrypt')) {
+echo 'loaded'.'. ';
+$txtplain='Test OK';
+$keyenc='ABCDEabcde1234567890';
+# echo ' ('.'Key (Hex)'.': '.$keyenc.') ';
+$txtenc=xcrypt('mcrypt',0,$txtplain,$keyenc);
+# echo ' ('.'mcrypt (ENC): '.$txtenc.') ';
+$txtdec=xcrypt('mcrypt',1,$txtenc,$keyenc);
+echo $txtdec;
+} else {echo $msgstwarn.'NOT loaded'.$msgenwarn;}
+echo "<br />\n";
+}
+
 }
 
 if ($tsts['db']) {
 include('functions_db.php');
 
 echo 'DB'.': ';
-switch ($dbx) {
+switch (strtolower($dbx)) {
 case 'mysql':
 case 'mysqli':
 $dbn='MySQL';
@@ -256,7 +378,7 @@ break;
 if ($dbxcon=dbx_connect($dbx,$db_host,$db_user,$db_pwd,$db_name)) {
 $dbxinfo=dbx_server_info($dbx,$dbxcon);
 echo $dbn.' server is running';
-echo '. '.'Version info'.': '.$dbxinfo;
+echo '. '.'Version'.': '.$dbxinfo;
 echo "<br />\n";
 } else {
 $dbxinfo='';
