@@ -9,4 +9,4 @@ You can run it as a test page after the first installation of your webserver or 
 http://labs.geody.com/webservertest/
 
 Screenshot:
-<img src="http://i.imgur.com/1LkF82C.png" alt="GeodyLabs Webserver Test screenshot" />
+<img src="https://raw.githubusercontent.com/ElfQrin/webservertest/master/webservertest_screenshot.png" alt="GeodyLabs Webserver Test screenshot" />
