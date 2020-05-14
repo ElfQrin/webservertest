@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.1 r2020-03-27 fr2016-10-01
+# v2.2 r2020-05-14 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -11,10 +11,12 @@ $page_start_time=microtime(true);
 
 # Configuration
 
+$xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
+
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, disk space, disk space (bar graph), test file (create, write, read, delete), image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'diskspace'=>true, 'diskspacebar'=>false, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo, page generation time.
 $dsfmt=2; # Disk Space format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
@@ -32,7 +34,7 @@ $tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The 
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # Data to be written into the test file (up to 1024 bytes)
 $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # String for the encryption text
 
-$logen=true; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
+$logen=false; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
 $logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'sprot'=>true, 'sdiskt'=>true, 'sdiskf'=>true, 'sdisku'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Disk Space, Free Disk Space, Used Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
 $dsfmtl=1; # Disk Space format for logs: 1: bytes, 2: human readable;
@@ -153,6 +155,7 @@ sodium_memzero($msg); sodium_memzero($decodedcipher); sodium_memzero($key);
 return $r;
 }
 sodium_memzero($msg); sodium_memzero($decodedcipher); sodium_memzero($key);
+# $r='*** ERROR: General Failure';
 return $r;
 }
 break;
@@ -184,10 +187,10 @@ $user_browser = getRemoteBrowser(addslashes($_SERVER['HTTP_USER_AGENT']));
 
 $dival="left"; if ($oufmt==2) {$dival='center';}
 
-if (strtolower(trim($_REQUEST['mode']))=='example') {
-# Example mode
+if ($xmpmode===true || strtolower(trim($_REQUEST['mode']))=='example') {
+# Example mode / Test Mode
 $xmp=true;
-# $logen=false; # If logging is enabled note that the actual value of the server will be logged, not the fake information shown on screen
+$logen=false; # Keep logging disabled in example mode to prevent fake information to be logged
 } else {$xmp=false;}
 
 header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1
@@ -359,7 +362,14 @@ $txtenc=xcrypt('sodium',0,$txtplain,$keyenc);
 # echo ' ('.'Sodium (ENC): '.$txtenc.') ';
 $txtdec=xcrypt('sodium',1,$txtenc,$keyenc);
 # echo $txtdec.' ';
-if ($txtdec===$txtplain) {echo 'Encryption Test OK!';} else {echo $msgstwarn.'Encryption Test FAILED'.$msgenwarn; ++$sysok;}
+if ($txtdec===$txtplain) {
+echo 'Encryption Test OK!';
+} else {
+echo $msgstwarn.'Encryption Test FAILED';
+if (substr($txtdec,0,11)=='*** ERROR: ') {echo ': '.substr($txtdec,11);}
+echo $msgenwarn;
+++$sysok;
+}
 } else {
 echo ', '.'but mbstring extension (required for the test) is missing.';
 }
@@ -435,8 +445,14 @@ echo "<br />\n";
 }
 
 if ($tsts['diskspace'] || $tsts['diskspacebar']) {
-$ds=disk_total_space('/'); $dso=$ds;
+if (!$xmp) {
+$ds=disk_total_space('/'); 
 $df=disk_free_space('/'); $dfo=$df;
+} else {
+$ds=113.3*1024*1024;
+$df=88.56*1024*1024;
+}
+$dso=$ds; $dfo=$df;
 $dfp=sprintf('%1.2f',$df*100/$ds); $dup=100-$dfp;
 $du=$ds-$df; $duo=$du;
 if ($dsfmt==2) {$ds=hrsize($ds); $df=hrsize($df); $du=hrsize($du);}
@@ -470,6 +486,11 @@ if ($do) {$data=fread($foa,1024); if (!$data) {echo $msgstwarn.'Cannot read test
 fclose($foa);
 if ($do) {$foad=unlink($tfile); if (!$foad) {echo $msgstwarn.'Cannot remove test file'.$msgenwarn.'. '; $do=false; ++$sysok;} else {echo 'Removed'.'. ';}}
 if ($do && $rmatch) {echo 'Success!'; $tfiler='OK';} else {echo $msgstwarn.'FAILED!'.$msgenwarn; $tfiler='FAILED'; ++$sysok;}
+echo "<br />\n";
+}
+
+if ($tsts['chars']) {
+echo 'Characters'.': '.'<span title="Numbers">0-9</span> <span title="Letters">a-z A-Z</a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span> | <span title="Porportional Test">WWW iii</span> | <span title="Similar looking Characters">B83 1lIi oO0 sS5 uvUV zZ2</span>';
 }
 
 echo "<br />\n";
