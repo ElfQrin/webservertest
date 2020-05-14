@@ -8,5 +8,4 @@ You can run it as a test page after the first installation of your webserver or 
 
 http://labs.geody.com/webservertest/
 
-Screenshot:
 <img src="https://raw.githubusercontent.com/ElfQrin/webservertest/master/webservertest_screenshot.png" alt="GeodyLabs Webserver Test screenshot" />
