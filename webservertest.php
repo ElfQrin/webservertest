@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.2 r2020-05-14 fr2016-10-01
+# v2.3 r2020-10-24 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -71,7 +71,7 @@ return $os_platform;
 
 function getRemoteBrowser($user_agent) {
 $browser = "Unknown";
-$browser_array = array('/msie/i' => 'Internet Explorer', '/firefox/i' => 'Firefox', '/safari/i' => 'Safari', '/chrome/i' => 'Chrome', '/edge/i' => 'Edge', '/opera/i' => 'Opera', '/netscape/i' => 'Netscape', '/maxthon/i' => 'Maxthon', '/konqueror/i' => 'Konqueror', '/lynx/i' => 'Lynx', '/wget/i' => 'Wget');
+$browser_array = array('/msie/i' => 'Internet Explorer', '/edg/i' => 'Edge', '/chrome/i' => 'Chrome', '/firefox/i' => 'Firefox', '/opera/i' => 'Opera', '/netscape/i' => 'Netscape', '/maxthon/i' => 'Maxthon', '/konqueror/i' => 'Konqueror', '/lynx/i' => 'Lynx', '/wget/i' => 'Wget', '/safari/i' => 'Safari');
 foreach ($browser_array as $regex => $value) {
 if (preg_match($regex, $user_agent)) {
 $browser = $value; break;
@@ -159,6 +159,20 @@ sodium_memzero($msg); sodium_memzero($decodedcipher); sodium_memzero($key);
 return $r;
 }
 break;
+case 'openssl':
+$cipher='aes-256-cbc';
+$ivlen = openssl_cipher_iv_length($cipher);
+# $iv = openssl_random_pseudo_bytes($ivlen);
+$ivsec = '1234567890123456789012345678901234567890123456789012345678901234';
+$iv = substr(hash('sha256', $ivsec), 0, $ivlen);
+if ($mode==0) {
+$r = base64_encode(openssl_encrypt($msg, $cipher, $key, 0, $iv));
+return $r;
+} else {
+$r = openssl_decrypt(base64_decode($msg), $cipher, $key, 0, $iv);
+return $r;
+}
+break;
 case 'mcrypt':
 if ($mode==0) {
 $iv = mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), MCRYPT_DEV_URANDOM);
@@ -168,8 +182,8 @@ $r = base64_encode($iv.$crypt);
 return $r;
 } else {
 $combo = base64_decode($msg);
-$iv = substr($combo, 0,  mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
-$crypt = substr($combo,  mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), strlen($combo));
+$iv = substr($combo, 0, mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC));
+$crypt = substr($combo, mcrypt_get_iv_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_CBC), strlen($combo));
 $r = mcrypt_decrypt(MCRYPT_RIJNDAEL_128, $key, $crypt, MCRYPT_MODE_CBC, $iv);
 return $r;
 }
@@ -383,7 +397,7 @@ if (extension_loaded('mcrypt')) {
 echo 'Loaded'.'. ';
 $txtplain=$ttxtplain;
 $keyenc='ABCDEabcde1234567890';
-# echo ' ('.'Key (Hex)'.': '.$keyenc.') ';
+# echo ' ('.'Key'.': '.$keyenc.') ';
 $txtenc=xcrypt('mcrypt',0,$txtplain,$keyenc);
 # echo ' ('.'mcrypt (ENC): '.$txtenc.') ';
 $txtdec=xcrypt('mcrypt',1,$txtenc,$keyenc);
@@ -393,6 +407,37 @@ if ($txtdec===$txtplain) {echo 'Encryption Test OK!';} else {echo $msgstwarn.'En
 echo "<br />\n";
 }
 
+}
+
+if ($tsts['ossl']) {
+$osslv=shell_exec('openssl version -v'); $osslv=preg_replace('~[\r\n]+~','',$osslv);
+if (strtolower(substr($osslv,0,8))==="openssl ") {$osslv=substr($osslv,strpos($osslv," ")+1);}
+echo 'OpenSSL: '.$osslv.'. ';
+
+$txtplain=$ttxtplain;
+$keyenc='ABCDEabcde1234567890';
+# echo ' ('.'Key'.': '.$keyenc.') ';
+$txtenc=shell_exec('echo -n "'.$txtplain.'"|openssl aes-256-cbc -pbkdf2 -salt -pass pass:'.$keyenc.'|base64');
+# echo ' ('.'openssl (ENC): '.$txtenc.') ';
+$txtdec=shell_exec('echo -n "'.$txtenc.'"|base64 -d|openssl aes-256-cbc -d -pbkdf2 -pass pass:'.$keyenc);
+# echo $txtdec.' ';
+if ($txtdec===$txtplain) {echo 'Encryption Test OK!';} else {echo $msgstwarn.'Encryption Test FAILED'.$msgenwarn; ++$sysok;}
+echo "<br />\n";
+}
+
+if ($tsts['osslphp']) {
+$osslphpv=OPENSSL_VERSION_TEXT.' '.'('.OPENSSL_VERSION_NUMBER.')';
+if (strtolower(substr($osslphpv,0,8))==="openssl ") {$osslphpv=substr($osslphpv,strpos($osslphpv," ")+1);}
+echo 'OpenSSL (PHP): '.$osslphpv.'. ';
+$txtplain=$ttxtplain;
+$keyenc='ABCDEabcde1234567890';
+# echo ' ('.'Key'.': '.$keyenc.') ';
+$txtenc=xcrypt('openssl',0,$txtplain,$keyenc);
+# echo ' ('.'openssl php (ENC): '.$txtenc.') ';
+$txtdec=xcrypt('openssl',1,$txtenc,$keyenc);
+# echo $txtdec.' ';
+if ($txtdec===$txtplain) {echo 'Encryption Test OK!';} else {echo $msgstwarn.'Encryption Test FAILED'.$msgenwarn; ++$sysok;}
+echo "<br />\n";
 }
 
 if ($tsts['db']) {
@@ -415,26 +460,13 @@ if ($dbxcon=dbx_connect($dbx,$db_host,$db_user,$db_pwd,$db_name)) {
 $dbxinfo=dbx_server_info($dbx,$dbxcon);
 echo $dbn.' server is running';
 echo '. '.'Version'.': '.$dbxinfo;
+dbx_close($dbx,$dbxcon);
 echo "<br />\n";
 } else {
 $dbxinfo='';
 echo $msgstwarn.$dbn.' server is NOT running or NOT connected'.$msgenwarn; ++$sysok;
 echo "<br />\n";
 }
-}
-
-if ($tsts['ossl']) {
-$osslv=shell_exec('openssl version -v');
-if (strtolower(substr($osslv,0,8))==="openssl ") {$osslv=substr($osslv,strpos($osslv," ")+1);}
-echo 'OpenSSL: '.$osslv;
-echo "<br />\n";
-}
-
-if ($tsts['osslphp']) {
-$osslphpv=OPENSSL_VERSION_TEXT.' '.'('.OPENSSL_VERSION_NUMBER.')';
-if (strtolower(substr($osslphpv,0,8))==="openssl ") {$osslphpv=substr($osslphpv,strpos($osslphpv," ")+1);}
-echo 'OpenSSL (PHP): '.$osslphpv;
-echo "<br />\n";
 }
 
 if ($tsts['prot']) {
@@ -490,7 +522,7 @@ echo "<br />\n";
 }
 
 if ($tsts['chars']) {
-echo 'Characters'.': '.'<span title="Numbers">0-9</span> <span title="Letters">a-z A-Z</a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span> | <span title="Porportional Test">WWW iii</span> | <span title="Similar looking Characters">B83 1lIi oO0 sS5 uvUV zZ2</span>';
+echo 'Characters'.': '.'<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</a></a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span><!-- | <span title="Porportional Test">WWW iii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG6 C( D) 1lIi oO0 gq9 sS5 uvUV zZ2</span> -->';
 }
 
 echo "<br />\n";
