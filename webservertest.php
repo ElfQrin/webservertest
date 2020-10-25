@@ -1,8 +1,8 @@
-<?
+<?php
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.4.1 r2020-10-25 fr2016-10-01
+# v2.4.2 r2020-10-25 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -211,7 +211,7 @@ header("Expires: 0"); // Proxies
 <!DOCTYPE html>
 <html>
 <head>
-<title>Web Server Test<? echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')'; ?></title>
+<title>Web Server Test<?php echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')'; ?></title>
 <meta name="Author" content="Valerio Capello - http://labs.geody.com/" />
 <meta name="Description" content="Test if the webserver is up and running" />
 <meta name="Generator" content="Handwritten using EditPlus" />
@@ -257,12 +257,12 @@ Date.now = function() { return new Date().getTime(); }
 }
 
 var ctmst=Math.floor(Date.now()/1000);
-var stmst=<? echo time(); ?>;
-if (Math.abs(ctmst-stmst)><? echo $mxcstimediff; ?>) { var wrntst='<? echo $msgstwarn; ?>'; var wrnten='<? echo $msgenwarn; ?>'; } else { var wrntst=''; var wrnten=''; }
+var stmst=<?php echo time(); ?>;
+if (Math.abs(ctmst-stmst)><?php echo $mxcstimediff; ?>) { var wrntst='<?php echo $msgstwarn; ?>'; var wrnten='<?php echo $msgenwarn; ?>'; } else { var wrntst=''; var wrnten=''; }
 
 // -->
 </script>
-<?
+<?php
 $jswarnsttime='
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -278,18 +278,18 @@ document.write(wrnten);
 </script>
 ';
 ?>
-<div name="main" id="main" align="<? echo $dival; ?>" style="text-align: <? echo $dival; ?>;">
-<?
+<div name="main" id="main" align="<?php echo $dival; ?>" style="text-align: <?php echo $dival; ?>;">
+<?php
 if ($oufmt==2) {
 echo '<table border="1" cellpadding="5" cellspacing="0" class="t1"><tr><td align="center">'."\n";
 }
 ?>
 <h1>Web Server Test</h1>
-<?
+<?php
 if ($tsts['img']) {
 ?>
 <img src="webservertestimg.png" alt="Test image NOT loaded" title="Test" border="0" class="im1" /><br />
-<?
+<?php
 }
 if ($oufmt==2 && ($tserver || $tclient)) {
 echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n";
@@ -624,7 +624,7 @@ var dwds=new Array('Sun','Mon','Tue','Wed','Thu','Fri','Sat');
 var dmms=new Array('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
 var ndateObj=new Date();
 
-<? if ($tstc['dateu']) { ?>
+<?php if ($tstc['dateu']) { ?>
 var nddu=ndateObj.getUTCDate();
 var nmmu=ndateObj.getUTCMonth();
 var nyyu=ndateObj.getUTCFullYear();
@@ -633,9 +633,9 @@ var nhhu=ndateObj.getUTCHours();
 var nmnu=ndateObj.getUTCMinutes();
 var nssu=ndateObj.getUTCSeconds();
 document.writeln("Date"+": "+wrntst+dwds[ndwu]+" "+npadf2(nddu,2)+"-"+dmms[nmmu]+"-"+nyyu+" "+npadf2(nhhu,2)+":"+npadf2(nmnu,2)+":"+npadf2(nssu,2)+" "+"UTC"+wrnten+"<br />");
-<? } ?>
+<?php } ?>
 
-<? if ($tstc['datel']) { ?>
+<?php if ($tstc['datel']) { ?>
 var nddl=ndateObj.getDate();
 var nmml=ndateObj.getMonth();
 var nyyl=ndateObj.getFullYear();
@@ -646,19 +646,19 @@ var nssl=ndateObj.getSeconds();
 var ntzl=ndateObj.getTimezoneOffset(); ntzl*=-1;
 if (ntzl>0) {var ntzsl="+";} else {var ntzsl="";}
 document.writeln("Date"+": "+wrntst+dwds[ndwl]+" "+npadf2(nddl,2)+"-"+dmms[nmml]+"-"+nyyl+" "+npadf2(nhhl,2)+":"+npadf2(nmnl,2)+":"+npadf2(nssl,2)+" UTC"+ntzsl+""+(ntzl/60)+" "+"("+"local"+")"+wrnten+"<br />");
-<? } ?>
+<?php } ?>
 
-<? if ($tstc['os']) { ?>document.writeln("Client OS"+": "+"<? echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<? } ?>
-<? if ($tstc['browser']) { ?>document.writeln("Browser"+": "+"<? echo $user_browser; ?>"+"<br />");<? } ?>
-<? if ($tstc['uagent']) { ?>document.writeln("User Agent"+": "+"<? echo addslashes($_SERVER['HTTP_USER_AGENT']); ?>"+"<br />");<? } ?>
+<?php if ($tstc['os']) { ?>document.writeln("Client OS"+": "+"<?php echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<?php } ?>
+<?php if ($tstc['browser']) { ?>document.writeln("Browser"+": "+"<?php echo $user_browser; ?>"+"<br />");<?php } ?>
+<?php if ($tstc['uagent']) { ?>document.writeln("User Agent"+": "+"<?php echo addslashes($_SERVER['HTTP_USER_AGENT']); ?>"+"<br />");<?php } ?>
 
 document.writeln("JavaScript"+": "+"Enabled"+"<br />");
 // -->
 </script>
 <noscript>
-JavaScript: <? echo $msgstwarn; ?>DISABLED<? echo $msgenwarn; ?>
+JavaScript: <?php echo $msgstwarn; ?>DISABLED<?php echo $msgenwarn; ?>
 </noscript>
-<?
+<?php
 }
 
 if ($oufmt==2 && ($tserver || $tclient)) {
@@ -730,7 +730,7 @@ fclose($fob);
 
 ?>
 </div>
-<?
+<?php
 if ($tsts['phpinfo']) {
 echo '<div name="extra" id="extra">';
 phpinfo();
