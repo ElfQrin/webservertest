@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.4 r2020-10-25 fr2016-10-01
+# v2.4.1 r2020-10-25 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -508,6 +508,7 @@ progbarx3(300,2,1,$memusdp,$memusdp+$memavlp,"#ee55aa","#ffdd11","#00ff00","#111
 if ($tsts['swapspace'] || $tsts['swapspacebar']) {
 $swpspc=shell_exec('swapon --show --noheadings --raw --bytes | xargs | awk \'{print $1","$3","$4}\''); # Swap: Name, Total, Used
 $swpspca=explode(',',$swpspc);
+$swpspca[2]=str_replace(array("\r\n","\n","\r"),'',$swpspca[2]);
 
 $swpnam=$swpspca[0];
 if ($memspca[1]!=0) {
@@ -524,6 +525,7 @@ $swptot=$swpspca[1]; $swpusd=$swpspca[2]; $swpfre=$swpspca[1]-$swpspca[2];
 
 if ($tsts['swapspace']) {
 echo 'Swap'.': ';
+# echo 'Name'.': '.$swpnam.', ';
 echo 'Tot.'.': '.$swptot.', ';
 echo 'Used'.': '.$swpusd.' ('.$swpusdp.'%'.')'.', ';
 echo 'Free'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'.';
