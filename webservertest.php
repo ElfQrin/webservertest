@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.5 r2020-10-26 fr2016-10-01
+# v2.5.1 r2020-10-26 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -356,7 +356,7 @@ $upt_date=trim(shell_exec('uptime -s'));
 }
 if ($tsts['lastboot']) {
 $upt_now=trim(shell_exec('uptime -p'));
-echo 'Last Reboot'.': '.$upt_date.' ('.$upt_now.')'."<br />\n";
+echo 'Last Boot'.': '.$upt_date.' ('.$upt_now.')'."<br />\n";
 }
 
 if ($tsts['bootid'] || $logem['sbootid']) {
