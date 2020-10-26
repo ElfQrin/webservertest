@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.4.2 r2020-10-25 fr2016-10-01
+# v2.4.3 r2020-10-26 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -107,8 +107,8 @@ function progbar($sl=200,$ph=5,$bord=1,$pc=50,$col1="#ee8811",$col2="#4444ee",$c
 echo '<div style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right, '.$col1.' 0%, '.$col1.' '.$pc.'%, '.$col2.' '.$pc.'%, '.$col2.' 100%);"></div>';
 }
 
-function progbarx3($sl=200,$ph=5,$bord=1,$pc1=33,$pc2=66,$col1="#ee8811",$col2="#4444ee",$col3="#44ee44",$colbord="#111111") {
-echo '<div style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right, '.$col1.' 0%, '.$col1.' '.$pc1.'%, '.$col2.' '.$pc1.'%, '.$col2.' '.$pc2.'%, '.$col3.' '.$pc2.'%, '.$col3.' 100%);"></div>';
+function progbarx4($sl=200,$ph=5,$bord=1,$pc1=25,$pc2=50,$pc3=75,$col1="#ee8811",$col2="#1188ee",$col3="#4444ee",$col4="#44ee44",$colbord="#111111") {
+echo '<div style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right, '.$col1.' 0%, '.$col1.' '.$pc1.'%, '.$col2.' '.$pc1.'%, '.$col2.' '.$pc2.'%, '.$col3.' '.$pc2.'%, '.$col3.' '.$pc3.'%, '.$col4.' '.$pc3.'%, '.$col4.' '.' 100%);"></div>';
 }
 
 function xcrypt($cipher='sodium',$mode=0,$msg,$key) {
@@ -476,30 +476,32 @@ echo "<br />\n";
 if ($tsts['memspace'] || $tsts['memspacebar']) {
 $memspc=shell_exec('free | xargs | awk \'{print $8","$9","$10","$13}\''); # Memory: Total, Used, Free, Available
 $memspca=explode(',',$memspc);
+$memspca[4]=$memspca[0]-($memspca[1]+$memspca[2]+$memspca[3]); # Other (cache / buffers)
 
 if ($memspca[0]!=0) {
-$memusdp=sprintf('%1.2f',$memspca[1]*100/$memspca[0]); $memfrep=sprintf('%1.2f',$memspca[2]*100/$memspca[0]); $memavlp=sprintf('%1.2f',$memspca[3]*100/$memspca[0]);
+$memusdp=sprintf('%1.2f',$memspca[1]*100/$memspca[0]); $memfrep=sprintf('%1.2f',$memspca[2]*100/$memspca[0]); $memavlp=sprintf('%1.2f',$memspca[3]*100/$memspca[0]); $memothp=sprintf('%1.2f',$memspca[4]*100/$memspca[0]);
 } else {
-$memusdp=0; $memfrep=0; $memavlp=0;
+$memusdp=0; $memfrep=0; $memavlp=0; $memothp=0;
 }
 
 if ($memsfmt==2) {
-$memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsize($memspca[2]*1024); $memavl=hrsize($memspca[3]*1024);
+$memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsize($memspca[2]*1024); $memavl=hrsize($memspca[3]*1024); $memoth=hrsize($memspca[4]*1024);
 } else {
-$memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memavl=$memspca[3]*1024;
+$memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memavl=$memspca[3]*1024; $memoth=$memspca[4]*1024;
 }
 
 if ($tsts['memspace']) {
 echo 'Memory'.': ';
 echo 'Tot.'.': '.$memtot.', ';
 echo 'Used'.': '.$memusd.' ('.$memusdp.'%'.')'.', ';
+echo 'Other'.': '.$memoth.' ('.$memothp.'%'.')'.', '; echo "<br />";
 echo 'Avail'.': '.$memavl.' ('.$memavlp.'%'.')'.', ';
 echo 'Free'.': '.$memfre.' ('.$memfrep.'%'.')'.'.';
 echo "<br />\n";
 }
 
 if ($tsts['memspacebar']) {
-progbarx3(300,2,1,$memusdp,$memusdp+$memavlp,"#ee55aa","#ffdd11","#00ff00","#111111");
+progbarx4(300,2,1,$memusdp,$memusdp+$memothp,$memusdp+$memothp+$memavlp,"#ee55aa","#bb77ee","#ffdd11","#00ff00","#111111");
 # echo "<br />\n";
 }
 
@@ -558,7 +560,7 @@ if ($memsfmt==2) {$ds=hrsize($ds); $df=hrsize($df); $du=hrsize($du);}
 }
 
 if ($tsts['diskspace']) {
-echo 'Disk Space'.': ';
+echo 'Disk'.': ';
 echo 'Tot.'.': '.$ds.', ';
 echo 'Used'.': '.$du.' ('.$dup.'%'.')'.', ';
 if ($dfo<$ldf) {echo $msgstwarn;}
@@ -589,7 +591,7 @@ echo "<br />\n";
 }
 
 if ($tsts['chars']) {
-echo 'Characters'.': '.'<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</a></a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span><!-- | <span title="Porportional Test">WWW iii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG6 C( D) 1lIi oO0 gq9 sS5 uvUV zZ2</span> -->';
+echo 'Characters'.': '.'<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</a></a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span><!-- | <span title="Porportional Test">WWW iii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG64 1lIi oO0 gq9 sS5 uvUV zZ2</span> -->';
 }
 
 echo "<br />\n";
