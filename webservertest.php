@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.4.3 r2020-10-26 fr2016-10-01
+# v2.5 r2020-10-26 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -31,6 +31,7 @@ break;
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
 
+
 # Configuration
 
 $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
@@ -38,7 +39,7 @@ $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from 
 $oufmt=2; # Output: 1: Flat (No Tables), 2: Within Tables.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo, page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysloadavg'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo, page generation time.
 $memsfmt=2; # Memory output format: 1: bytes, 2: human readable;
 
 $tclient=true; # Test the Client
@@ -48,6 +49,9 @@ $dbx="mysqli"; # MySQL, MySQLi, PostgreSQL
 $db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Password
 $db_name=''; # You can leave this empty
 
+$maxsysloadavx1=30; # Maximum acceptable system load average over the last 1 minute
+$maxsysloadavx2=20; # Maximum acceptable system load average over the last 5 minutes
+$maxsysloadavx3=20; # Maximum acceptable system load average over the last 15 minutes
 $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between client and server
 $mxtimepgen=.9; # Maximum acceptable time (in seconds) to generate the page
 $ldf=200000; # Low disk free space (in bytes)
@@ -58,7 +62,7 @@ $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
 
 $logen=false; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'sprot'=>true, 'memt'=>true, 'memu'=>true, 'mema'=>true, 'memf'=>true, 'swpt'=>true, 'swpu'=>true, 'swpf'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'ssysloadavg'=>true, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'sprot'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
 $memsfmtl=1; # Memory output format for logs: 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes a log item
@@ -103,12 +107,21 @@ if (preg_match('/mobile/i', $user_agent)) {$browser.=' ('.'Mobile'.')';}
 return $browser;
 }
 
-function progbar($sl=200,$ph=5,$bord=1,$pc=50,$col1="#ee8811",$col2="#4444ee",$colbord="#111111") {
-echo '<div style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right, '.$col1.' 0%, '.$col1.' '.$pc.'%, '.$col2.' '.$pc.'%, '.$col2.' 100%);"></div>';
+function progbar($tag='div',$sl=200,$ph=5,$bord=1,$pc=array(100),$col=array("#ee0000","#00ee00","#0000ee"),$colbord="#111111") {
+$pcn=count($pc); $coln=count($col);
+if ($pcn>0) {
+if ($coln<=0) {$col=array("#ee0000","#00ee00","#0000ee"); $coln=count($col);}
+echo '<'.$tag.' style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right,';
+$i2=0;
+for ($i1=0; $i1<=$pcn; ++$i1) {
+if ($i1==0) {$pos1=0;} else {$pos1=$pc[$i1-1];}
+if ($i1>=$pcn) {$pos2=100;} else {$pos2=$pc[$i1];}
+echo ' '.$col[$i2].' '.$pos1.'%, '.$col[$i2].' '.$pos2.'%';
+if ($i1<$pcn) {echo ',';}
+++$i2; if ($i2>=$coln) {$i2=0;}
 }
-
-function progbarx4($sl=200,$ph=5,$bord=1,$pc1=25,$pc2=50,$pc3=75,$col1="#ee8811",$col2="#1188ee",$col3="#4444ee",$col4="#44ee44",$colbord="#111111") {
-echo '<div style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right, '.$col1.' 0%, '.$col1.' '.$pc1.'%, '.$col2.' '.$pc1.'%, '.$col2.' '.$pc2.'%, '.$col3.' '.$pc2.'%, '.$col3.' '.$pc3.'%, '.$col4.' '.$pc3.'%, '.$col4.' '.' 100%);"></div>';
+echo ');">'.'</'.$tag.'>';
+}
 }
 
 function xcrypt($cipher='sodium',$mode=0,$msg,$key) {
@@ -325,11 +338,67 @@ if ($tsts['port']) {if ($tsts['ip']) {echo ' ';}; echo 'Port'.': '.$_SERVER['SER
 echo "<br />\n";
 }
 
+if ($tsts['prot']) {
+echo 'Protocol'.': '.$_SERVER['SERVER_PROTOCOL'];
+echo ' - ';
+if ($_SERVER['HTTPS']) {echo 'Secure (HTTPS)';} else {echo 'NOT Secure';}
+echo "<br />\n";
+}
 
 if ($tsts['dateu']) {echo 'Date'.': '.$jswarnsttime.gmdate('D d-M-Y H:i:s').' '.'UTC'.$jswarnentime."<br />\n";}
 if ($tsts['datel']) {
 $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}
 echo 'Date'.': '.$jswarnsttime.date('D d-M-Y H:i:s').' '.'UTC'.$ntzsl.($ntzl/3600).' (local)'.$jswarnentime."<br />\n";
+}
+
+if ($tsts['lastboot'] || $logem['slastboot']) {
+$upt_date=trim(shell_exec('uptime -s'));
+}
+if ($tsts['lastboot']) {
+$upt_now=trim(shell_exec('uptime -p'));
+echo 'Last Reboot'.': '.$upt_date.' ('.$upt_now.')'."<br />\n";
+}
+
+if ($tsts['bootid'] || $logem['sbootid']) {
+if (!$xmp) {
+$bootid=shell_exec('cat /proc/sys/kernel/random/boot_id');
+$bootid=preg_replace('~[\r\n]+~','',$bootid);
+} else {
+$bootid='6c3a8c81-7c0a-4083-8f9a-28b5ee236577';
+}
+}
+if ($tsts['bootid']) {
+echo 'Boot ID'.': '.$bootid."<br />\n";
+}
+
+if ($tsts['sysloadavg'] || $logem['ssysloadavg']) {
+if (!$xmp) {
+$sysloadav=shell_exec('uptime | awk -F\'[a-z]:\' \'{print $2}\''); # System Load Average over the last 1, 5, 15 minutes.
+} else {
+$sysloadav=' 0.45, 1.12, 1.26';
+}
+$sysloadava=explode(',',$sysloadav);
+for ($i=0; $i<count($sysloadava); ++$i) {$sysloadava[$i]=(float)$sysloadava[$i];}
+}
+
+if ($tsts['sysloadavg']) {
+if (!$xmp) {
+$cpucoresn=trim(shell_exec('grep -c \'processor\' /proc/cpuinfo')); $cpucoresn=(int)$cpucoresn;
+} else {
+$cpucoresn=1;
+}
+echo 'Load Avg';
+echo ' ('.'Cores'.': '.$cpucoresn.')';
+echo ': ';
+echo '1 m'.': ';
+if ($sysloadava[0]<=$maxsysloadavx1) {echo $sysloadava[0];} else {echo $msgstwarn.$sysloadava[0].$msgenwarn; ++$sysok;}
+echo ', ';
+echo '5 m'.': ';
+if ($sysloadava[1]<=$maxsysloadavx2) {echo $sysloadava[1];} else {echo $msgstwarn.$sysloadava[1].$msgenwarn; ++$sysok;}
+echo ', ';
+echo '15 m'.': ';
+if ($sysloadava[2]<=$maxsysloadavx3) {echo $sysloadava[2];} else {echo $msgstwarn.$sysloadava[2].$msgenwarn; ++$sysok;}
+echo '.'."<br />\n";
 }
 
 # if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
@@ -466,22 +535,18 @@ echo "<br />\n";
 }
 }
 
-if ($tsts['prot']) {
-echo 'Protocol'.': '.$_SERVER['SERVER_PROTOCOL'];
-echo ' - ';
-if ($_SERVER['HTTPS']) {echo 'Secure (HTTPS)';} else {echo 'NOT Secure';}
-echo "<br />\n";
-}
-
-if ($tsts['memspace'] || $tsts['memspacebar']) {
+if ($tsts['memspace'] || $tsts['memspacebar'] || $logem['smemt'] || $logem['smemu'] || $logem['smema'] || $logem['smemf']) {
 $memspc=shell_exec('free | xargs | awk \'{print $8","$9","$10","$13}\''); # Memory: Total, Used, Free, Available
 $memspca=explode(',',$memspc);
+for ($i=0; $i<count($memspca); ++$i) {$memspca[$i]=(int)$memspca[$i];}
 $memspca[4]=$memspca[0]-($memspca[1]+$memspca[2]+$memspca[3]); # Other (cache / buffers)
 
 if ($memspca[0]!=0) {
 $memusdp=sprintf('%1.2f',$memspca[1]*100/$memspca[0]); $memfrep=sprintf('%1.2f',$memspca[2]*100/$memspca[0]); $memavlp=sprintf('%1.2f',$memspca[3]*100/$memspca[0]); $memothp=sprintf('%1.2f',$memspca[4]*100/$memspca[0]);
 } else {
 $memusdp=0; $memfrep=0; $memavlp=0; $memothp=0;
+}
+
 }
 
 if ($memsfmt==2) {
@@ -501,22 +566,22 @@ echo "<br />\n";
 }
 
 if ($tsts['memspacebar']) {
-progbarx4(300,2,1,$memusdp,$memusdp+$memothp,$memusdp+$memothp+$memavlp,"#ee55aa","#bb77ee","#ffdd11","#00ff00","#111111");
+progbar('div',300,2,1,array(floor($memusdp),floor($memusdp+$memothp),floor($memusdp+$memothp+$memavlp)),array("#ee55aa","#bb77ee","#ffdd11","#00ff00"),"#111111");
 # echo "<br />\n";
 }
 
-}
-
-if ($tsts['swapspace'] || $tsts['swapspacebar']) {
+if ($tsts['swapspace'] || $tsts['swapspacebar'] || $logem['sswpt'] || $logem['sswpu'] || $logem['sswpf']) {
 $swpspc=shell_exec('swapon --show --noheadings --raw --bytes | xargs | awk \'{print $1","$3","$4}\''); # Swap: Name, Total, Used
 $swpspca=explode(',',$swpspc);
-$swpspca[2]=str_replace(array("\r\n","\n","\r"),'',$swpspca[2]);
+$swpspca[2]=preg_replace('~[\r\n]+~','',$swpspca[2]);
+for ($i=0; $i<count($swpspca); ++$i) {$swpspca[$i]=(int)$swpspca[$i];}
 
 $swpnam=$swpspca[0];
 if ($memspca[1]!=0) {
 $swpusdp=sprintf('%1.2f',$swpspca[2]*100/$swpspca[1]); $swpfrep=100-$swpusdp;
 } else {
 $swpusdp=0; $swpfrep=0;
+}
 }
 
 if ($memsfmt==2) {
@@ -535,13 +600,12 @@ echo "<br />\n";
 }
 
 if ($tsts['swapspacebar']) {
-progbar(300,2,1,floor($swpusdp),"#ee55aa","#00ff00","#111111");
+progbar('div',300,2,1,array(floor($swpusdp)),array("#ee55aa","#00ff00"),"#111111");
 # echo "<br />\n";
 }
 
-}
 
-if ($tsts['diskspace'] || $tsts['diskspacebar'] || $logem['sdiskt'] || $logem['sdiskf'] || $logem['sdisku']) {
+if ($tsts['diskspace'] || $tsts['diskspacebar'] || $logem['sdiskt'] || $logem['sdisku'] || $logem['sdiskf']) {
 if (!$xmp) {
 $ds=disk_total_space('/'); 
 $df=disk_free_space('/');
@@ -571,7 +635,7 @@ echo "<br />\n";
 }
 
 if ($tsts['diskspacebar']) {
-progbar(300,2,1,floor($dup),"#ee55aa","#00ff00","#111111");
+progbar('div',300,2,1,array(floor($dup)),array("#ee55aa","#00ff00"),"#111111");
 # echo "<br />\n";
 }
 
@@ -679,6 +743,9 @@ if ($logem['sport']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(
 if ($logem['sdateu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(gmdate('Y-m-d H:i:s')).' '.'UTC'.$logqs2; $itm++;}
 if ($logem['sdatel']) {if ($itm>0) {$oul.=$logitmsep;}; $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}; $oul.=$logqs1.addslashes(date('Y-m-d H:i:s')).' '.'UTC'.$ntzsl.($ntzl/3600).$logqs2; $itm++;}
 # if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
+if ($logem['slastboot']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('LBOOT'.' '.$upt_date).$logqs2; $itm++;}
+if ($logem['sbootid']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('BOOTID'.' '.$bootid).$logqs2; $itm++;}
+if ($logem['ssysloadavg']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SLDAVG'.' '.$sysloadava[0].';'.$sysloadava[1].';'.$sysloadava[2]).$logqs2; $itm++;}
 if ($logem['sos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(php_uname('s').' '.php_uname('v').' ('.php_uname('m').')').$logqs2; $itm++;}
 if ($logem['swebserversoft']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes($_SERVER['SERVER_SOFTWARE']).$logqs2; $itm++;}
 if ($logem['sphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PHP'.' '.PHP_VERSION).$logqs2; $itm++;}
@@ -686,26 +753,26 @@ if ($logem['sdb']) {if ($itm>0) {$oul.=$logitmsep;}; if ($dbxinfo=='') {$dbxinfo
 if ($logem['sossl']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSSL'.' '.$osslv).$logqs2; $itm++;}
 if ($logem['sosslphp']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSSL-PHP'.' '.$osslphpv).$logqs2; $itm++;}
 if ($logem['sprot']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('Protocol'.' '.$_SERVER['SERVER_PROTOCOL']); if ($_SERVER['HTTPS']) {$oul.=addslashes(' (HTTPS)');} else {$oul.=addslashes(' (HTTP)');}; $oul.=$logqs2; $itm++;}
-if ($logem['memt'] || $logem['memu'] || $logem['mema'] || $logem['memf']) {
+if ($logem['smemt'] || $logem['smemu'] || $logem['smema'] || $logem['smemf']) {
 if ($memsfmtl==2) {
 $memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsize($memspca[2]*1024); $memavl=hrsize($memspca[3]*1024);
 } else {
 $memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memavl=$memspca[3]*1024;
 }
-if ($logem['memt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MET'.' '.$memtot).$logqs2; $itm++;}
-if ($logem['memu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEU'.' '.$memusd).$logqs2; $itm++;}
-if ($logem['mema']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEA'.' '.$memfre).$logqs2; $itm++;}
-if ($logem['memf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEF'.' '.$memavl).$logqs2; $itm++;}
+if ($logem['smemt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MET'.' '.$memtot).$logqs2; $itm++;}
+if ($logem['smemu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEU'.' '.$memusd).$logqs2; $itm++;}
+if ($logem['smema']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEA'.' '.$memfre).$logqs2; $itm++;}
+if ($logem['smemf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('MEF'.' '.$memavl).$logqs2; $itm++;}
 }
-if ($logem['swpt'] || $logem['swpu'] || $logem['swpf']) {
+if ($logem['sswpt'] || $logem['sswpu'] || $logem['sswpf']) {
 if ($memsfmtl==2) {
 $swptot=hrsize($swpspca[1]); $swpusd=hrsize($swpspca[2]); $swpfre=hrsize($swpspca[1]-$swpspca[2]);
 } else {
 $swptot=$swpspca[1]; $swpusd=$swpspca[2]; $swpfre=$swpspca[1]-$swpspca[2];
 }
-if ($logem['swpt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWT'.' '.$swptot).$logqs2; $itm++;}
-if ($logem['swpu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWU'.' '.$swpusd).$logqs2; $itm++;}
-if ($logem['swpf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWF'.' '.$swpfre).$logqs2; $itm++;}
+if ($logem['sswpt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWT'.' '.$swptot).$logqs2; $itm++;}
+if ($logem['sswpu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWU'.' '.$swpusd).$logqs2; $itm++;}
+if ($logem['sswpf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWF'.' '.$swpfre).$logqs2; $itm++;}
 }
 if ($logem['sdiskt'] || $logem['sdisku'] || $logem['sdiskf']) {
 if ($memsfmtl==2) {$ds=hrsize($dso); $df=hrsize($dfo); $du=hrsize($duo);} else {$ds=$dso; $df=$dfo; $du=$duo;}
