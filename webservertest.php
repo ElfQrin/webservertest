@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-# v2.5.1 r2020-10-26 fr2016-10-01
+# v2.5.2 r2020-10-27 fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -536,37 +536,42 @@ echo "<br />\n";
 }
 
 if ($tsts['memspace'] || $tsts['memspacebar'] || $logem['smemt'] || $logem['smemu'] || $logem['smema'] || $logem['smemf']) {
-$memspc=shell_exec('free | xargs | awk \'{print $8","$9","$10","$13}\''); # Memory: Total, Used, Free, Available
+$memspc=shell_exec('free -w | xargs | awk \'{print $9","$10","$11","$12","$13","$14","$15}\''); # Memory: Total, Used, Free, Shared, Buffers, Cache, Available
 $memspca=explode(',',$memspc);
 for ($i=0; $i<count($memspca); ++$i) {$memspca[$i]=(int)$memspca[$i];}
-$memspca[4]=$memspca[0]-($memspca[1]+$memspca[2]+$memspca[3]); # Other (cache / buffers)
+# $memspca[4]=$memspca[0]-($memspca[1]+$memspca[2]+$memspca[3]); # Other (cache / buffers)
 
 if ($memspca[0]!=0) {
-$memusdp=sprintf('%1.2f',$memspca[1]*100/$memspca[0]); $memfrep=sprintf('%1.2f',$memspca[2]*100/$memspca[0]); $memavlp=sprintf('%1.2f',$memspca[3]*100/$memspca[0]); $memothp=sprintf('%1.2f',$memspca[4]*100/$memspca[0]);
+$memusdp=sprintf('%1.2f',$memspca[1]*100/$memspca[0]); $memfrep=sprintf('%1.2f',$memspca[2]*100/$memspca[0]); $membufp=sprintf('%1.2f',$memspca[4]*100/$memspca[0]); $memcacp=sprintf('%1.2f',$memspca[5]*100/$memspca[0]);
+$memavlp=sprintf('%1.2f',$memspca[6]*100/$memspca[0]);
 } else {
-$memusdp=0; $memfrep=0; $memavlp=0; $memothp=0;
+$memusdp=0; $memfrep=0; $membufp=0; $memcacp=0; $memavlp=0;
 }
 
 }
 
 if ($memsfmt==2) {
-$memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsize($memspca[2]*1024); $memavl=hrsize($memspca[3]*1024); $memoth=hrsize($memspca[4]*1024);
+# Memory: Total, Used, Free, Shared, Buffers, Cache, Available
+$memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsize($memspca[2]*1024); $memsha=hrsize($memspca[3]*1024); $membuf=hrsize($memspca[4]*1024); $memcac=hrsize($memspca[5]*1024); $memavl=hrsize($memspca[6]*1024);
 } else {
-$memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memavl=$memspca[3]*1024; $memoth=$memspca[4]*1024;
+$memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memsha=$memspca[3]*1024; $membuf=$memspca[4]*1024; $memcac=$memspca[5]*1024; $memavl=$memspca[6]*1024;
 }
 
 if ($tsts['memspace']) {
 echo 'Memory'.': ';
 echo 'Tot.'.': '.$memtot.', ';
-echo 'Used'.': '.$memusd.' ('.$memusdp.'%'.')'.', ';
-echo 'Other'.': '.$memoth.' ('.$memothp.'%'.')'.', '; echo "<br />";
-echo 'Avail'.': '.$memavl.' ('.$memavlp.'%'.')'.', ';
-echo 'Free'.': '.$memfre.' ('.$memfrep.'%'.')'.'.';
+echo 'Used'.': '.$memusd.' ('.$memusdp.'%'.')'.', '; echo "<br />";
+echo 'Buffers'.': '.$membuf.' ('.$membufp.'%'.')'.', ';
+echo 'Cache'.': '.$memcac.' ('.$memcacp.'%'.')'.', ';
+echo 'Free'.': '.$memfre.' ('.$memfrep.'%'.')'.', '; echo "<br />";
+echo 'Shared'.': '.$memsha.', ';
+echo 'Avail'.': '.$memavl.'.';
 echo "<br />\n";
 }
 
 if ($tsts['memspacebar']) {
-progbar('div',300,2,1,array(floor($memusdp),floor($memusdp+$memothp),floor($memusdp+$memothp+$memavlp)),array("#ee55aa","#bb77ee","#ffdd11","#00ff00"),"#111111");
+progbar('div',300,3,1,array(floor($memusdp),floor($memusdp+$membufp),floor($memusdp+$membufp+$memcacp)),array("#ee55aa","#bb7711","#dd9933","#00ff00"),"#111111");
+progbar('div',300,3,1,array(floor(100-$memavlp)),array("#cc4488","#dddd00"),"#111111");
 # echo "<br />\n";
 }
 
@@ -600,7 +605,7 @@ echo "<br />\n";
 }
 
 if ($tsts['swapspacebar']) {
-progbar('div',300,2,1,array(floor($swpusdp)),array("#ee55aa","#00ff00"),"#111111");
+progbar('div',300,3,1,array(floor($swpusdp)),array("#ee55aa","#00ff00"),"#111111");
 # echo "<br />\n";
 }
 
@@ -635,7 +640,7 @@ echo "<br />\n";
 }
 
 if ($tsts['diskspacebar']) {
-progbar('div',300,2,1,array(floor($dup)),array("#ee55aa","#00ff00"),"#111111");
+progbar('div',300,3,1,array(floor($dup)),array("#ee55aa","#00ff00"),"#111111");
 # echo "<br />\n";
 }
 
