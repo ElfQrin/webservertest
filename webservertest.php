@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-$xprodver='v2.6 r2020-10-27'; # fr2016-10-01
+$xprodver='v2.6.1 r2020-10-27'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -672,8 +672,8 @@ if (!$xmp) {
 $ds=disk_total_space('/'); 
 $df=disk_free_space('/');
 } else {
-$ds=113.3*1024*1024;
-$df=88.56*1024*1024;
+$ds=113.3*1024*1024*1024;
+$df=88.56*1024*1024*1024;
 }
 $dso=$ds; $dfo=$df;
 if ($ds!=0) {
