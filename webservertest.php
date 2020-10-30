@@ -426,6 +426,7 @@ $cpucoresn=1;
 
 if ($tsts['sysinfohw']) {
 $machnam=trim(shell_exec('cat /sys/class/dmi/id/product_name')); $machvnd=trim(shell_exec('cat /sys/class/dmi/id/sys_vendor'));
+$mboardnam=trim(shell_exec('cat /sys/class/dmi/id/board_name')); $mboardvnd=trim(shell_exec('cat /sys/class/dmi/id/board_vendor'));
 $cpunam=ltrim(substr(ltrim(substr(trim(shell_exec('grep "model name" /proc/cpuinfo | head -1')),10)),1)); $cpopms=ltrim(substr(trim(shell_exec('lscpu | grep "mode(s)"')),16));
 $biosvnd=trim(shell_exec('cat /sys/class/dmi/id/bios_vendor')); $biosver=trim(shell_exec('cat /sys/class/dmi/id/bios_version')); $biosdat=trim(shell_exec('cat /sys/class/dmi/id/bios_date'));
 
@@ -433,6 +434,11 @@ echo '<span class="helem">'.'Machine'.'</span>'.': '.$machnam;
 echo ' (';
 echo '<!-- <span class="helem2">'.'Vendor'.'</span>'.': -->'.$machvnd;
 echo ')';
+echo "<br />\n";
+
+echo '<span class="helem">'.'Board'.'</span>'.': '.$mboardvnd;
+echo ' ';
+echo $mboardnam;
 echo "<br />\n";
 
 echo '<span class="helem">'.'CPU'.'</span>'.': '.$cpunam;
