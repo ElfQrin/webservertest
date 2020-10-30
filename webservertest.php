@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-$xprodver='v2.7 r2020-10-28'; # fr2016-10-01
+$xprodver='v2.7 r2020-10-30'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
