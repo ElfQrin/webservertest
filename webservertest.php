@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-$xprodver='v2.7 r2020-10-30'; # fr2016-10-01
+$xprodver='v2.7.1 r2020-11-02'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -39,7 +39,7 @@ $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from 
 $oufmt=2; # Output Layout: 1: Flat (No Boxes), 2: Boxed.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>true, 'machid'=>false, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>false, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
 $shellex=true; # Enable tests that require the execution of a Linux shell command: Last Boot, Uptime, Boot ID, System Load Average, openssl [it doesn't affect PHP openssl extension], Memory, Swap.
 $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: human readable;
 $barsiz=300; # Bars size (in pixels)
@@ -54,6 +54,7 @@ $db_name=''; # You can leave this empty
 $maxsysloadavx1=30; # Maximum acceptable system load average over the last 1 minute
 $maxsysloadavx2=20; # Maximum acceptable system load average over the last 5 minutes
 $maxsysloadavx3=15; # Maximum acceptable system load average over the last 15 minutes
+$sysloadavpercore=false; # Multiply maximum acceptable values for every core
 $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between client and server
 $mxtimepgen=.9; # Maximum acceptable time (in seconds) to generate the page. Note if you enable phpinfo, you should add about 1 second.
 $ldf=200000; # Low disk free space (in bytes)
@@ -620,7 +621,8 @@ $sysloadava=explode(',',$sysloadav);
 for ($i=0; $i<count($sysloadava); ++$i) {$sysloadava[$i]=(float)$sysloadava[$i];}
 }
 
-if ($tsts['sysloadavg']) {
+if ($tsts['sysloadavg'] && count($sysloadava)==3) {
+if ($sysloadavpercore) {$maxsysloadavx1*=$cpucoresn; $maxsysloadavx2*=$cpucoresn; $maxsysloadavx3*=$cpucoresn;}
 echo '<span class="helem">'.'Load Avg'.'</span>';
 echo ' ('.'<span class="helem2">'.'Cores'.'</span>'.': '.$cpucoresn.')';
 echo ': ';
@@ -633,6 +635,8 @@ echo ', ';
 echo '<span class="helem2">'.'15 m'.'</span>'.': ';
 if ($sysloadava[2]<=$maxsysloadavx3) {echo $sysloadava[2];} else {echo $msgstwarn.$sysloadava[2].$msgenwarn; ++$sysok;}
 echo '.'."<br />\n";
+} else {
+$sysloadava=array(false,false,false);
 }
 
 if ($tsts['memspace'] || $tsts['memspacebar'] || $logem['smemt'] || $logem['smemu'] || $logem['smema'] || $logem['smemf']) {
