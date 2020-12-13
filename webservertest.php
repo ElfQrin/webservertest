@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-$xprodver='v2.7.1 r2020-11-02'; # fr2016-10-01
+$xprodver='v2.7.2 r2020-12-12'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -285,6 +285,7 @@ h2 {display: block; font-size: 1.05em; margin-top: 1%; margin-bottom: 1%; margin
 .helem2 { font-weight: bold; font-style: italic; }
 .txtsml {font-size: 70%;}
 .prodver {font-size: 70%;}
+.section {margin-top: 2px; margin-bottom: 5px;}
 img.im1 {float: none; border: 0; padding: 5px 1px 8px 1px;}
 
 </style>
@@ -357,8 +358,11 @@ echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n
 # echo '['.$msgstwarn.'WARNING TEST'.$msgenwarn.']'."<br /><br />\n"; # ++$sysok;
 
 if ($tserver) {
+$section1='server';
 
-echo '<h2>'.'Server'.'</h2>';
+echo '<a name="'.$section1.'"></a>'.'<h2>'.'Server'.'</h2>';
+
+$section=$section1.'_'.'id'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 
 if ($tsts['host']) {
 echo '<span class="helem">'.'Host Name'.'</span>'.': ';
@@ -389,6 +393,37 @@ if ($_SERVER['HTTPS']) {echo 'Secure (HTTPS)';} else {echo 'NOT Secure';}
 echo "<br />\n";
 }
 
+if ($shellex) {
+
+if ($tsts['machid'] || $logem['smachid']) {
+if (!$xmp) {
+$machid=shell_exec('cat /etc/machine-id');
+$machid=preg_replace('~[\r\n]+~','',$machid);
+} else {
+$machid='1c9582af20b049f7a03b-3b7bd26514bf';
+}
+}
+if ($tsts['machid']) {
+echo '<span class="helem">'.'Machine ID'.'</span>'.': '.$machid."<br />\n";
+}
+
+if ($tsts['bootid'] || $logem['sbootid']) {
+if (!$xmp) {
+$bootid=shell_exec('cat /proc/sys/kernel/random/boot_id');
+$bootid=preg_replace('~[\r\n]+~','',$bootid);
+} else {
+$bootid='6c3a8c81-7c0a-4083-8f9a-28b5ee236577';
+}
+}
+if ($tsts['bootid']) {
+echo '<span class="helem">'.'Boot ID'.'</span>'.': '.$bootid."<br />\n";
+}
+
+}
+
+echo '</p>';
+
+$section=$section1.'_'.'date'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 if ($tsts['dateu']) {echo '<span class="helem">'.'Date'.'</span>'.': '.$jswarnsttime.gmdate('D d-M-Y H:i:s').' '.'UTC'.$jswarnentime."<br />\n";}
 if ($tsts['datel']) {
 $ntzl=date('Z'); if ($ntzl>0) {$ntzsl="+";} else {$ntzsl="";}
@@ -405,17 +440,14 @@ $upt_now=trim(shell_exec('uptime -p'));
 echo '<span class="helem">'.'Last Boot'.'</span>'.': '.$upt_date.' ('.$upt_now.')'."<br />\n";
 }
 
-if ($tsts['bootid'] || $logem['sbootid']) {
-if (!$xmp) {
-$bootid=shell_exec('cat /proc/sys/kernel/random/boot_id');
-$bootid=preg_replace('~[\r\n]+~','',$bootid);
-} else {
-$bootid='6c3a8c81-7c0a-4083-8f9a-28b5ee236577';
 }
-}
-if ($tsts['bootid']) {
-echo '<span class="helem">'.'Boot ID'.'</span>'.': '.$bootid."<br />\n";
-}
+
+echo '</p>';
+
+
+if ($shellex) {
+
+$section=$section1.'_'.'hw'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 
 if ($tsts['sysinfohw'] || $tsts['sysloadavg'] || $logem['ssysloadavg']) {
 if (!$xmp) {
@@ -458,19 +490,11 @@ echo '<!-- <span class="helem2">'.'Date'.'</span>'.': -->'.$biosdat;
 echo "<br />\n";
 }
 
-if ($tsts['machid'] || $logem['smachid']) {
-if (!$xmp) {
-$machid=shell_exec('cat /etc/machine-id');
-$machid=preg_replace('~[\r\n]+~','',$machid);
-} else {
-$machid='1c9582af20b049f7a03b-3b7bd26514bf';
-}
-}
-if ($tsts['machid']) {
-echo '<span class="helem">'.'Machine ID'.'</span>'.': '.$machid."<br />\n";
-}
+echo '</p>';
 
 }
+
+$section=$section1.'_'.'sw'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 
 # if ($tsts['os']) {echo 'Web Server OS'.': '.php_uname('s').' '.php_uname('r').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
 if ($tsts['os']) {echo '<span class="helem">'.'Web Server OS'.'</span>'.': '.php_uname('s').' '.php_uname('v').' ('.php_uname('m').')'."<br />\n";}
@@ -608,6 +632,10 @@ echo $msgstwarn.$dbn.' server is NOT running or NOT connected'.$msgenwarn; ++$sy
 echo "<br />\n";
 }
 }
+
+echo '</p>';
+
+$section=$section1.'_'.'performance'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 
 if ($shellex) {
 
@@ -782,13 +810,19 @@ if ($tsts['chars']) {
 echo '<span class="helem">'.'Characters'.'</span>'.': '.'<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</a></a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span><!-- | <span title="Porportional Test">WWW iii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG64 1lIi oO0 gq9 sS5 uvUV zZ2</span> -->';
 }
 
-echo "<br />\n";
+echo '</p>';
+
+# echo "<br />\n";
 }
 
 if ($tclient) {
-if ($tserver) {echo "<br />\n";}
+$section1='client';
 
-echo '<h2>'.'Client'.'</h2>';
+# if ($tserver) {echo "<br />\n";}
+
+echo '<a name="'.$section1.'"></a>'.'<h2>'.'Client'.'</h2>';
+
+$section=$section1.'_'.'id'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
 
 if ($tstc['ip'] || $tstc['port']) {
 if ($tstc['ip']) {
@@ -802,6 +836,11 @@ echo '192.0.2.'.rand(60,200);
 if ($tstc['port']) {if ($tstc['ip']) {echo ' ';}; echo '<span class="helem">'.'Port'.'</span>'.': '.$_SERVER['REMOTE_PORT'];}
 echo "<br />\n";
 }
+
+echo '</p>';
+
+$section=$section1.'_'.'date'; echo '<p class="section" name="'.$section.'" id="'.$section.'">';
+
 ?>
 <script language="JavaScript" type="text/javascript">
 <!--
@@ -838,6 +877,8 @@ var ntzl=ndateObj.getTimezoneOffset(); ntzl*=-1;
 if (ntzl>0) {var ntzsl="+";} else {var ntzsl="";}
 document.writeln('<span class="helem">'+"Date"+'</span>'+": "+wrntst+dwds[ndwl]+" "+npadf2(nddl,2)+"-"+dmms[nmml]+"-"+nyyl+" "+npadf2(nhhl,2)+":"+npadf2(nmnl,2)+":"+npadf2(nssl,2)+" UTC"+ntzsl+""+(ntzl/60)+" "+"("+"local"+")"+wrnten+"<br />");
 <?php } ?>
+document.writeln('<?php echo '</p>'; ?>');
+document.writeln('<?php $section=$section1.'_'.'sw'; echo '<p class="section" name="'.$section.'" id="'.$section.'">'; ?>');
 
 <?php if ($tstc['os']) { ?>document.writeln('<span class="helem">'+"Client OS"+'</span>'+": "+"<?php echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<?php } ?>
 <?php if ($tstc['browser']) { ?>document.writeln('<span class="helem">'+"Browser"+'</span>'+": "+"<?php echo $user_browser; ?>"+"<br />");<?php } ?>
@@ -850,6 +891,8 @@ document.writeln('<span class="helem">'+"JavaScript"+'</span>'+": "+"Enabled"+"<
 <span class="helem">JavaScript</span>: <?php echo $msgstwarn; ?>DISABLED<?php echo $msgenwarn; ?>
 </noscript>
 <?php
+echo '</p>';
+
 }
 
 if ($oufmt==2 && ($tserver || $tclient)) {
