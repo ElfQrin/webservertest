@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.8 r2021-07-18'; # fr2016-10-01
+$xprodver='v2.8.1 r2021-07-18'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -257,14 +257,14 @@ header("Expires: 0"); // Proxies
 /* Light Theme */
 /*
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
-table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: center; background-color: #ffffff;}
+table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; background-color: #ffffff; font-size: 85%; text-align: center; }
 .prodlink {font-size: 70%; text-decoration: none; color: #1111ee;}
 .misclink {text-decoration: none; color: #1111ee;}
 .isok {color: #00dd00;}
 .warn {color: #dd0000;}
 .isokstatus {color: #00dd00; font-weight: bold;}
 .warnstatus {color: #dd0000; font-weight: bold;}
-div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto;}
+div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto; border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; background-color: #ffffff; }
 div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 */
@@ -272,14 +272,14 @@ div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: aut
 /* Dark Theme */
 
 body {background-color: #0e0e0e; color: #efefef; font-family: Arial, Helvetica, sans-serif;}
-table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: center; background-color: #121212;}
+table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; background-color: #121212; font-size: 85%; text-align: center;}
 .prodlink {font-size: 70%; text-decoration: none; color: #8888ff;}
 .misclink {text-decoration: none; color: #8888ff;}
 .isok {color: #55ee55;}
 .warn {color: #ee5555;}
 .isokstatus {color: #55ee55; font-weight: bold;}
 .warnstatus {color: #ee5555; font-weight: bold;}
-div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto;}
+div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto; border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; background-color: #121212;}
 div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 
