@@ -1,8 +1,8 @@
 <?php
 $page_start_time=microtime(true);
 # Web Server Test
-# By Valerio Capello (Elf Qrin) - http://labs.geody.com/
-$xprodver='v2.7.2 r2020-12-12'; # fr2016-10-01
+# By Valerio Capello (Elf Qrin) - https://labs.geody.com/
+$xprodver='v2.8 r2021-07-18'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -31,7 +31,6 @@ break;
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
 
-
 # Configuration
 
 $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
@@ -39,8 +38,8 @@ $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from 
 $oufmt=2; # Output Layout: 1: Flat (No Boxes), 2: Boxed.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>false, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
-$shellex=true; # Enable tests that require the execution of a Linux shell command: Last Boot, Uptime, Boot ID, System Load Average, openssl [it doesn't affect PHP openssl extension], Memory, Swap.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'conn'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), estabilished connections, character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
+$shellex=true; # Enable tests that require the execution of a Linux shell command: Last Boot, Uptime, Boot ID, System Load Average, openssl [it doesn't affect PHP openssl extension], Memory, Swap, Estabilished Connections.
 $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: human readable;
 $barsiz=300; # Bars size (in pixels)
 
@@ -63,9 +62,12 @@ $tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The 
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # Data to be written into the test file (up to 1024 bytes)
 $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # String for the encryption test
 
-$logen=false; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
+$cportnums=array(22,80,443); # Ports to test for estabilished connections
+$cportnams=array('22'=>'SSH','80'=>'HTTP','443'=>'HTTPS'); # Port Labels (Names)
+
+$logen=true; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
 $memsfmtl=1; # Memory output format for logs (NOT for the display): 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes (prefix) a log item
@@ -242,7 +244,7 @@ header("Expires: 0"); // Proxies
 <html>
 <head>
 <title>Web Server Test<?php echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')'; ?></title>
-<meta name="Author" content="Valerio Capello - http://labs.geody.com/" />
+<meta name="Author" content="Valerio Capello - https://labs.geody.com/" />
 <meta name="Description" content="Test if the webserver is up and running" />
 <meta name="Generator" content="Handwritten using EditPlus" />
 <meta name="Keywords" content="checkup test server webserver WAMP LAMP Windows Linux Apache PHP MySQL MySQLi PostgreSQL HTML JavaScript" />
@@ -256,24 +258,30 @@ header("Expires: 0"); // Proxies
 /*
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: center; background-color: #ffffff;}
-table.t2 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; font-size: 85%; text-align: left; background-color: #ffffff;}
 .prodlink {font-size: 70%; text-decoration: none; color: #1111ee;}
+.misclink {text-decoration: none; color: #1111ee;}
 .isok {color: #00dd00;}
 .warn {color: #dd0000;}
 .isokstatus {color: #00dd00; font-weight: bold;}
 .warnstatus {color: #dd0000; font-weight: bold;}
+div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto;}
+div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
+div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 */
 
 /* Dark Theme */
 
 body {background-color: #0e0e0e; color: #efefef; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: center; background-color: #121212;}
-table.t2 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; font-size: 85%; text-align: left; background-color: #121212;}
 .prodlink {font-size: 70%; text-decoration: none; color: #8888ff;}
+.misclink {text-decoration: none; color: #8888ff;}
 .isok {color: #55ee55;}
 .warn {color: #ee5555;}
 .isokstatus {color: #55ee55; font-weight: bold;}
 .warnstatus {color: #ee5555; font-weight: bold;}
+div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto;}
+div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
+div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 
 
 /* More */
@@ -286,6 +294,7 @@ h2 {display: block; font-size: 1.05em; margin-top: 1%; margin-bottom: 1%; margin
 .txtsml {font-size: 70%;}
 .prodver {font-size: 70%;}
 .section {margin-top: 2px; margin-bottom: 5px;}
+div.chars_1 { visibility:hidden; display:none; }
 img.im1 {float: none; border: 0; padding: 5px 1px 8px 1px;}
 
 </style>
@@ -344,13 +353,13 @@ echo '</td>';
 
 echo '<td align="right" valign="top" width="29%">';
 echo '<span class="prodver">'.$xprodver.'</span>'."<br />";
-echo '<a href="http://labs.geody.com/" target="_blank" class="prodlink">'.'by Geody Labs'.'</a>';
+echo '<a href="https://labs.geody.com/" target="_blank" class="prodlink">'.'by Geody Labs'.'</a>';
 echo '</td>';
 
 echo '</tr></table>';
 
 if ($oufmt==2 && ($tserver || $tclient)) {
-echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n";
+echo '<div class="tablediv">';
 }
 
 # Requires functions_db.php (if $tsts['db']==true), webservertestimg.png (if $tsts['img']==true)
@@ -359,6 +368,8 @@ echo '<table border="1" cellpadding="5" cellspacing="0" class="t2"><tr><td>'."\n
 
 if ($tserver) {
 $section1='server';
+
+echo '<div class="cell_'.$section1.'">';
 
 echo '<a name="'.$section1.'"></a>'.'<h2>'.'Server'.'</h2>';
 
@@ -806,17 +817,90 @@ if ($do && $rmatch) {echo $msgstok.'Success!'.$msgenok; $tfiler='OK';} else {ech
 echo "<br />\n";
 }
 
+
+if ($shellex && $tsts['conn']) {
+echo '<span class="helem">'.'Estabilished Connections'.'</span>'.': ';
+$fne=shell_exec('netstat -an');
+$conntot=shell_exec('printf "'.$fne.'\n" | awk \'{print $6}\' | grep \'ESTABLISHED\' | wc -l'); $conntot=str_replace("\n",'',$conntot);
+$conntottcp=shell_exec('printf "'.$fne.'\n" | awk \'{print $1 " " $6}\' | grep \'tcp\' | grep \'ESTABLISHED\' | wc -l'); $conntottcp=str_replace("\n",'',$conntottcp);
+$conntotudp=shell_exec('printf "'.$fne.'\n" | awk \'{print $1 " " $6}\' | grep \'udp\' | grep \'ESTABLISHED\' | wc -l'); $conntotudp=str_replace("\n",'',$conntotudp);
+
+$gpts=array(); $tgpts=0;
+if (count($cportnums)>0) {
+for ($i=0; $i<count($cportnums); ++$i) {
+$pt=$cportnums[$i];
+$gpts[$pt]=shell_exec('printf "'.$fne.'\n" | awk \'{print $4 " " $6}\' | grep ":'.$pt.' " | grep \'ESTABLISHED\' | wc -l');
+$tgpts+=$gpts[$pt];
+}
+$connotr=$conntot-$tgpts; # $connotr=shell_exec('printf "'.$fne.'\n" | awk \'{print $4 " " $6}\' | grep \'ESTABLISHED\' | wc -l'); $connotr-=$tgpts;
+}
+echo 'Total'.': '.$conntot.' ('.'TCP'.': '.$conntottcp.' + '.'UDP'.': '.$conntotudp.')'."<br />";
+if (count($cportnums)>0) {
+echo 'Ports'.': ';
+for ($i=0; $i<count($cportnums); ++$i) {
+$pt=$cportnums[$i];
+echo '# ';
+echo $pt;
+if ($cportnams[$pt]) {echo ' ('.$cportnams[$pt].')';}
+echo ': '.$gpts[$pt]." ; ";
+}
+echo 'Other'.': '.$connotr;
+}
+echo "<br />\n";
+}
+
+
 if ($tsts['chars']) {
-echo '<span class="helem">'.'Characters'.'</span>'.': '.'<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</a></a> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span><!-- | <span title="Porportional Test">WWW iii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG64 1lIi oO0 gq9 sS5 uvUV zZ2</span> -->';
+?>
+<script language="JavaScript" type="text/javascript">
+<!--
+// toggleBoxes
+// eltyp: 0: div, 1: table cell (th / td) ; shwflag: 0: hidden, 1: visible, 2: toggle ; collapse: 0: no, 1: yes
+function toggleBoxes(elid, eltyp, shwflag, collapse) {
+if (eltyp == 1) {visdisp1="table-cell";} else {visdisp1="block";}
+if (document.getElementsByClassName) {
+var obj = document.getElementsByClassName(elid);
+for (i=0; i<obj.length; i++) {
+switch (shwflag) {
+case 0:
+obj[i].style.visibility = "hidden"; if (collapse==1) { obj[i].style.display = "none"; } else { obj[i].style.display = visdisp1; }
+break;
+case 1:
+obj[i].style.visibility = "visible"; obj[i].style.display = visdisp1;
+break;
+default:
+case 2:
+if (obj[i].style.visibility == "visible") { obj[i].style.visibility = "hidden"; if (collapse==1) { obj[i].style.display = "none"; } else { obj[i].style.display = visdisp1; } } else { obj[i].style.visibility = "visible"; obj[i].style.display = visdisp1; }
+break;
+}
+}
+}
+}
+
+// -->
+</script>
+<?php
+echo '<span class="helem">'.'Characters'.'</span>'.': ';
+echo '<a href="javascript:toggleBoxes(\'chars_1\',0,2,1);" class="misclink">';
+echo '<span title="Numbers: 0123456789">0-9</span> <span title="Letters (lower case): abcdefghijklmonpqrstuvwxyz">a-z</span> <span title="Letters (Upper Case): ABCDEFGHIJKLMONPQRSTUVWXYZ">A-Z</span> | <span title="Accented Characters (Diacritic)">àçðñøšüÿž ÀÇÐÑØŠÜŸŽ</span>';
+echo '</a>';
+echo '<div class="chars_1">';
+echo "0123456789<br />ABCDEFGHIJKLMNOPQRSTUVWXYZ<br />abcdefghijklmnopqrstuvwxyz<br />ÀÁÂÃÄÅÇÈÉÊËÌÍÎÏÐÑÒÓÔÕÖØŠÙÚÛÜÝŸŽ<br />àáâãäåçèéêëìíîïðñòóôõöøšùúûüýÿž<br />!\"#$%&'()*+,-./ :;&lt;=&gt;?@ [\]^_´`<br />{|}~ æÆœŒßÞþ‚ƒ„…†‡ˆ‰‹›«»‘’“”•–—˜<br />¡¦€¢£¤¥§©®™¨ªº¬­¯±×÷°¹²³¼½¾µ¶·¸¿"."<br />";
+echo '<span title="Porportional Test">WWWWW iiiii</span> | <span title="Disambiguation Test (Visually Similar Characters)">B83 bG64 1lIi oO0 gq9 sS5 uvUV zZ2</span>';
+echo '</div>';
 }
 
 echo '</p>';
 
 # echo "<br />\n";
+
+echo '</div>';
 }
 
 if ($tclient) {
 $section1='client';
+
+echo '<div class="cell_'.$section1.'">';
 
 # if ($tserver) {echo "<br />\n";}
 
@@ -893,10 +977,12 @@ document.writeln('<span class="helem">'+"JavaScript"+'</span>'+": "+"Enabled"+"<
 <?php
 echo '</p>';
 
+echo '</div>';
 }
 
 if ($oufmt==2 && ($tserver || $tclient)) {
-echo '</td></tr></table>'."\n";
+echo '</div>';
+# echo '</td></tr></table>'."\n";
 }
 
 if ($logen) {
@@ -946,6 +1032,7 @@ if ($logem['sdisku']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes
 if ($logem['sdiskf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('DKF'.' '.$df).$logqs2; $itm++;}
 }
 if ($logem['sfile']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('FILE'.' '.$tfiler).$logqs2; $itm++;}
+if ($logem['sconn'] && $shellex) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('CONNTOT'.' '.$conntot).$logqs2; $oul.=$logitmsep; $oul.=$logqs1.addslashes('CONNTCP'.' '.$conntottcp).$logqs2; $oul.=$logitmsep; $oul.=$logqs1.addslashes('CONNUDP'.' '.$conntotudp).$logqs2; $itm++;}
 if ($logem['cip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPC'.' '.$_SERVER['REMOTE_ADDR']).$logqs2; $itm++;}
 if ($logem['cport']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PTC'.' '.$_SERVER['REMOTE_PORT']).$logqs2; $itm++;}
 if ($logem['cos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSC'.' '.$user_os).$logqs2; $itm++;}
@@ -972,6 +1059,7 @@ if ($tsts['gentime']) {
 $page_end_time=microtime(true);
 $page_time_gen=round($page_end_time-$page_start_time,5);
 
+echo '<div>';
 if ($oufmt==2) {echo '<span class="txtsml">';} else {echo "<br />"."\n";}
 if ($page_time_gen>$mxtimepgen) {echo $msgstwarn;}
 echo 'Page generated in'.' '.$page_time_gen.' '.'seconds'.'.';
@@ -991,6 +1079,7 @@ echo $msgstatusstwarn.$sysok.' '.'problems encountered during testing.'.$msgstat
 }
 }
 if ($oufmt==2) {echo '</span>';}
+echo '</div>';
 
 if ($oufmt==2) {
 echo '</td></tr></table>'."\n";
