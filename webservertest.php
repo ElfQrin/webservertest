@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.8.1 r2021-07-18'; # fr2016-10-01
+$xprodver='v2.8.2 r2021-07-21'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -31,6 +31,7 @@ break;
 # if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
 
+
 # Configuration
 
 $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
@@ -38,7 +39,7 @@ $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from 
 $oufmt=2; # Output Layout: 1: Flat (No Boxes), 2: Boxed.
 
 $tserver=true; # Test the Server
-$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>true, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'conn'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), estabilished connections, character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
+$tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>false, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'conn'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), estabilished connections, character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
 $shellex=true; # Enable tests that require the execution of a Linux shell command: Last Boot, Uptime, Boot ID, System Load Average, openssl [it doesn't affect PHP openssl extension], Memory, Swap, Estabilished Connections.
 $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: human readable;
 $barsiz=300; # Bars size (in pixels)
@@ -65,9 +66,9 @@ $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
 $cportnums=array(22,80,443); # Ports to test for estabilished connections
 $cportnams=array('22'=>'SSH','80'=>'HTTP','443'=>'HTTPS'); # Port Labels (Names)
 
-$logen=true; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
+$logen=false; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
 $memsfmtl=1; # Memory output format for logs (NOT for the display): 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes (prefix) a log item
@@ -732,6 +733,10 @@ progbar('div',$barsiz,3,1,array(floor(100-$memavlp)),array("#ee55aa","#00ff00"),
 # echo "<br />\n";
 }
 
+if ($tsts['swapspace'] || $logem['sswpn']) {
+$swppiness=shell_exec('cat /proc/sys/vm/swappiness'); $swppiness=trim(preg_replace('~[\r\n]+~','',$swppiness));
+}
+
 if ($tsts['swapspace'] || $tsts['swapspacebar'] || $logem['sswpt'] || $logem['sswpu'] || $logem['sswpf']) {
 $swpspc=shell_exec('swapon --show --noheadings --raw --bytes | xargs | awk \'{print $1","$3","$4}\''); # Swap: Name, Total, Used
 $swpspca=explode(',',$swpspc);
@@ -757,7 +762,8 @@ echo '<span class="helem">'.'Swap'.'</span>'.': ';
 # echo '<span class="helem2">'.'Name'.'</span>'.': '.$swpnam.', ';
 echo '<span class="helem2">'.'Tot'.'</span>'.': '.$swptot.', ';
 echo '<span class="helem2">'.'Used'.'</span>'.': '.$swpusd.' ('.$swpusdp.'%'.')'.', ';
-echo '<span class="helem2">'.'Free'.'</span>'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'.';
+echo '<span class="helem2">'.'Free'.'</span>'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'; ';
+echo '<span class="helem2">'.'Swappiness'.'</span>'.': '.$swppiness.'%';
 echo "<br />\n";
 }
 
@@ -1025,6 +1031,7 @@ if ($logem['sswpt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(
 if ($logem['sswpu']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWU'.' '.$swpusd).$logqs2; $itm++;}
 if ($logem['sswpf']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWF'.' '.$swpfre).$logqs2; $itm++;}
 }
+if ($logem['sswpf'] && $shellex) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('SWN'.' '.$swppiness).$logqs2; $itm++;}
 if ($logem['sdiskt'] || $logem['sdisku'] || $logem['sdiskf']) {
 if ($memsfmtl==2) {$ds=hrsize($dso); $df=hrsize($dfo); $du=hrsize($duo);} else {$ds=$dso; $df=$dfo; $du=$duo;}
 if ($logem['sdiskt']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('DKT'.' '.$ds).$logqs2; $itm++;}
