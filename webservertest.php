@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.8.2 r2021-07-21'; # fr2016-10-01
+$xprodver='v2.9 r2022-04-05'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -28,8 +28,13 @@ break;
 }
 */
 
-# if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
+$pwd=addslashes(str_replace(array('<','>','\\','"',"'",'?','&','+'),'',strip_tags(trim($_REQUEST['pwd']))));
+# if ($pwd!='123'.'45') {die('unauthorized');} # Simple password protection
 
+
+$lat=round($_REQUEST['lat'],5); if ($lat==='' || $lat < -90 || $lat > 90) {$lat=null;}
+$lon=round($_REQUEST['lon'],5); if ($lon==='' || $lon < -180 || $lon > 180) {$lon=null;}
+$unote=addslashes(str_replace(array('<','>','\\','"',"'",'?','&','+'),'',strip_tags(trim($_REQUEST['note']))));
 
 
 # Configuration
@@ -45,10 +50,10 @@ $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: 
 $barsiz=300; # Bars size (in pixels)
 
 $tclient=true; # Test the Client
-$tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'os'=>true, 'browser'=>true, 'uagent'=>false); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), OS, browser, User Agent. Note that information about the Client's OS and browser are gathered from the User Agent and may be forged.
+$tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'coords'=>true, 'os'=>true, 'browser'=>true, 'uagent'=>false, 'note'=>true); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), Geographic Coordinates (Latitude, Longitude), OS, browser, User Agent, Note (Comment). Note that information about the Client's OS and browser are gathered from the User Agent and may be forged. Geographic Coordinates (Latitude, Longitude) and Note (Comment) are sent via HTTP header or as URL parameters.
 
 $dbx="mysqli"; # MySQL, MySQLi, PostgreSQL
-$db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Password
+$db_host='localhost'; $db_user='master'; $db_pwd='bramast93x2'; # DataBase Host, User name and Password
 $db_name=''; # You can leave this empty
 
 $maxsysloadavx1=30; # Maximum acceptable system load average over the last 1 minute
@@ -59,16 +64,16 @@ $mxcstimediff=60; # Maximum acceptable time difference (in seconds) between clie
 $mxtimepgen=.9; # Maximum acceptable time (in seconds) to generate the page. Note if you enable phpinfo, you should add about 1 second.
 $ldf=200000; # Low disk free space (in bytes)
 
-$tfile='/var/www/html/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
+$tfile='/var/www/wwwdata/webservertest.txt'; # Path and name of the test file. The destination directory must be owned or enabled to be read and written by www-data:www-data
 $tfilec='Webserver test file - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # Data to be written into the test file (up to 1024 bytes)
 $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG the quick brown fox jumps over the lazy dog 0123456789 - labs.geody.com'; # String for the encryption test
 
 $cportnums=array(22,80,443); # Ports to test for estabilished connections
 $cportnams=array('22'=>'SSH','80'=>'HTTP','443'=>'HTTPS'); # Port Labels (Names)
 
-$logen=false; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
+$logen=true; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client OS, Client Browser, Client User Agent, Problems found.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'ccoords'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'cnote'=>true, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client Geographic Coordinates (Latitude, Longitude), Client OS, Client Browser, Client User Agent, Note (Comment) Problems found.
 $memsfmtl=1; # Memory output format for logs (NOT for the display): 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes (prefix) a log item
@@ -244,7 +249,12 @@ header("Expires: 0"); // Proxies
 <!DOCTYPE html>
 <html>
 <head>
-<title>Web Server Test<?php echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')'; ?></title>
+<title>Web Server Test<?php
+echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')';
+if ($tstc['coords'] && $lat!=0 && $lon!=0) {
+echo ' - Coords: '.$lat.','.$lon;
+}
+?></title>
 <meta name="Author" content="Valerio Capello - https://labs.geody.com/" />
 <meta name="Description" content="Test if the webserver is up and running" />
 <meta name="Generator" content="Handwritten using EditPlus" />
@@ -311,6 +321,28 @@ Date.now = function() { return new Date().getTime(); }
 var ctmst=Math.floor(Date.now()/1000);
 var stmst=<?php echo time(); ?>;
 if (Math.abs(ctmst-stmst)><?php echo $mxcstimediff; ?>) { var wrntst='<?php echo $msgstwarn; ?>'; var wrnten='<?php echo $msgenwarn; ?>'; } else { var wrntst=''; var wrnten=''; }
+
+
+function goucoords(pos) {
+var ulat=pos.coords.latitude; var ulon=pos.coords.longitude;
+// alert('Coods'+': '+ulat+', '+ulon);
+location.href="?lat="+ulat+"&lon="+ulon<?php
+if ($unote!=='' && $tstc['note'] || $logem['cnote']) {
+echo '+"&note='.urlencode($unote).'"';
+}
+if ($pwd!=='') {
+echo '+"&pwd='.urlencode($pwd).'"';
+}
+?>;
+}
+
+function findmego() {
+if (navigator.geolocation) {
+navigator.geolocation.getCurrentPosition(goucoords);
+} else { 
+alert("Sorry, I can't get your coordinates.\n\nCheck the Privacy options in your browser and system.");
+}
+}
 
 // -->
 </script>
@@ -970,9 +1002,21 @@ document.writeln('<span class="helem">'+"Date"+'</span>'+": "+wrntst+dwds[ndwl]+
 document.writeln('<?php echo '</p>'; ?>');
 document.writeln('<?php $section=$section1.'_'.'sw'; echo '<p class="section" name="'.$section.'" id="'.$section.'">'; ?>');
 
+<?php
+if ($tstc['coords']) {
+if ($lat==0 || $lon==0) {
+?>
+document.writeln('<span class="helem">'+"Coords"+'</span>'+": "+"<?php echo '<a href=\'javascript:findmego();\'>'.'Get User\'s Coordinates'.'</a>' ?>"+"<br />");
+<?php } else { ?>
+document.writeln('<span class="helem">'+"Coords"+'</span>'+": "+"<?php echo $lat.', '.$lon; ?>"+"<br />");
+<?php
+}
+}
+?>
 <?php if ($tstc['os']) { ?>document.writeln('<span class="helem">'+"Client OS"+'</span>'+": "+"<?php echo $user_os; ?>"+" "+"("+navigator.platform+")"+"<br />");<?php } ?>
 <?php if ($tstc['browser']) { ?>document.writeln('<span class="helem">'+"Browser"+'</span>'+": "+"<?php echo $user_browser; ?>"+"<br />");<?php } ?>
 <?php if ($tstc['uagent']) { ?>document.writeln('<span class="helem">'+"User Agent"+'</span>'+": "+"<?php echo addslashes($_SERVER['HTTP_USER_AGENT']); ?>"+"<br />");<?php } ?>
+<?php if ($tstc['note']) { ?>document.writeln('<span class="helem">'+"Note"+'</span>'+": "+"<?php echo $unote; ?>"+"<br />");<?php } ?>
 
 document.writeln('<span class="helem">'+"JavaScript"+'</span>'+": "+"Enabled"+"<br />");
 // -->
@@ -1042,9 +1086,11 @@ if ($logem['sfile']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes(
 if ($logem['sconn'] && $shellex) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('CONNTOT'.' '.$conntot).$logqs2; $oul.=$logitmsep; $oul.=$logqs1.addslashes('CONNTCP'.' '.$conntottcp).$logqs2; $oul.=$logitmsep; $oul.=$logqs1.addslashes('CONNUDP'.' '.$conntotudp).$logqs2; $itm++;}
 if ($logem['cip']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('IPC'.' '.$_SERVER['REMOTE_ADDR']).$logqs2; $itm++;}
 if ($logem['cport']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PTC'.' '.$_SERVER['REMOTE_PORT']).$logqs2; $itm++;}
+if ($logem['ccoords']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('COORDS'.' '.$lat.','.$lon).$logqs2; $itm++;}
 if ($logem['cos']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('OSC'.' '.$user_os).$logqs2; $itm++;}
 if ($logem['cbrowser']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('BRWSC'.' '.$user_browser).$logqs2; $itm++;}
 if ($logem['cuagent']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('UAGC'.' '.$_SERVER['HTTP_USER_AGENT']).$logqs2; $itm++;}
+if ($logem['cnote']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('NOTE'.' '.$unote).$logqs2; $itm++;}
 if ($logem['xprobs']) {if ($itm>0) {$oul.=$logitmsep;}; $oul.=$logqs1.addslashes('PROBLEMS'.' '.$sysok).$logqs2; $itm++;}
 $oul.=$logenten;
 # echo '['.$oul.']';
