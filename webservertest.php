@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.9 r2022-04-05'; # fr2016-10-01
+$xprodver='v2.9.1 r2022-04-05'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -1008,7 +1008,7 @@ if ($lat==0 || $lon==0) {
 ?>
 document.writeln('<span class="helem">'+"Coords"+'</span>'+": "+"<?php echo '<a href=\'javascript:findmego();\'>'.'Get User\'s Coordinates'.'</a>' ?>"+"<br />");
 <?php } else { ?>
-document.writeln('<span class="helem">'+"Coords"+'</span>'+": "+"<?php echo $lat.', '.$lon; ?>"+"<br />");
+document.writeln('<span class="helem">'+"Coords"+'</span>'+": "+"<?php echo '<a href=\'https://www.geody.com/geolook.php?world=terra&lat='.$lat.'&lon='.$lon.'\' target=\'_blank\'>'; ?>"+"<?php echo $lat.', '.$lon; ?>"+"</a>"+"<br />");
 <?php
 }
 }
