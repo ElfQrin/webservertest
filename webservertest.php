@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.9.3 r2022-04-08'; # fr2016-10-01
+$xprodver='v2.9.4 r2022-04-09'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -35,7 +35,11 @@ $pwd=addslashes(str_replace(array('<','>','\\','"',"'",'?','&','+'),'',strip_tag
 
 # Configuration
 
+# Note that support for client's coordinates is experimental ($tstc['coords'], $logem['ccoords']).
+
 $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
+
+$theme=2; # 0: None, 1: Light, 2: Dark
 
 $oufmt=2; # Output Layout: 1: Flat (No Boxes), 2: Boxed.
 
@@ -46,7 +50,7 @@ $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: 
 $barsiz=300; # Bars size (in pixels)
 
 $tclient=true; # Test the Client
-$tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'coords'=>false, 'os'=>true, 'browser'=>true, 'uagent'=>false, 'note'=>true); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), Geographic Coordinates (Latitude, Longitude), OS, browser, User Agent, Note (Comment). Note that information about the Client's OS and browser are gathered from the User Agent and may be forged. Notes (Comments) and Geographic Coordinates (Latitude, Longitude) are sent via HTTP header or as URL parameters. Note that support for client's coordinates is experimental.
+$tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'coords'=>false, 'os'=>true, 'browser'=>true, 'uagent'=>false, 'note'=>true); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), Geographic Coordinates (Latitude, Longitude), OS, browser, User Agent, Note (Comment). Note that information about the Client's OS and browser are gathered from the User Agent and may be forged. Notes (Comments) and Geographic Coordinates (Latitude, Longitude) are sent via HTTP header or as URL parameters.
 
 $dbx="mysqli"; # MySQL, MySQLi, PostgreSQL
 $db_host='localhost'; $db_user=''; $db_pwd=''; # DataBase Host, User name and Password
@@ -73,7 +77,7 @@ $cportnams=array('22'=>'SSH','80'=>'HTTP','443'=>'HTTPS'); # Port Labels (Names)
 
 $logen=false; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
-$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'ccoords'=>true, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'cnote'=>true, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client Geographic Coordinates (Latitude, Longitude), Client OS, Client Browser, Client User Agent, Note (Comment) Problems found.
+$logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'ccoords'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'cnote'=>true, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client Geographic Coordinates (Latitude, Longitude), Client OS, Client Browser, Client User Agent, Note (Comment) Problems found.
 $memsfmtl=1; # Memory output format for logs (NOT for the display): 1: bytes, 2: human readable;
 $logitmsep=', '; # Separates log items
 $logqs1='"'; # Precedes (prefix) a log item
@@ -267,8 +271,11 @@ echo ' @ '.$_SERVER['HTTP_HOST'].' ('.$_SERVER['SERVER_ADDR'].')';
 <meta http-equiv="Pragma" content="no-cache" />
 <meta http-equiv="Expires" content="0" />
 <style type="text/css">
+<?php
+switch ($theme) {
+case 1:
+?>
 /* Light Theme */
-/*
 body {background-color: #ffffff; color: #222222; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; background-color: #ffffff; font-size: 85%; text-align: center; }
 .prodlink {font-size: 70%; text-decoration: none; color: #1111ee;}
@@ -280,10 +287,11 @@ table.t1 {border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 
 div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto; border-collapse: collapse; border: 1px solid #ddddcc; box-shadow: 1px 2px 3px #ccccaa; background-color: #ffffff; }
 div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
-*/
-
+<?php
+break;
+case 2:
+?>
 /* Dark Theme */
-
 body {background-color: #0e0e0e; color: #efefef; font-family: Arial, Helvetica, sans-serif;}
 table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; background-color: #121212; font-size: 85%; text-align: center;}
 .prodlink {font-size: 70%; text-decoration: none; color: #8888ff;}
@@ -295,10 +303,12 @@ table.t1 {border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 
 div.tablediv {display: flex; flex-basis: fill; flex-wrap: wrap; float: none; margin: auto; width: 100%; overflow: auto; border-collapse: collapse; border: 1px solid #333322; box-shadow: 1px 2px 3px #444466; background-color: #121212;}
 div.cell_server {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
 div.cell_client {float: left; box-sizing: border-box; width: auto; overflow: auto; margin: 3px; padding: 2px; border: 0px; font-size: 85%; text-align: left;}
-
+<?php
+break;
+}
+?>
 
 /* More */
-
 table.th1 { border-collapse: collapse; }
 h1 {display: block; font-size: 1.1em; margin-top: 1%; margin-bottom: 1%; margin-left: 0; margin-right: 0; font-weight: bold;}
 h2 {display: block; font-size: 1.05em; margin-top: 1%; margin-bottom: 1%; margin-left: 0; margin-right: 0; font-weight: bold;}
@@ -324,7 +334,7 @@ var ctmst=Math.floor(Date.now()/1000);
 var stmst=<?php echo time(); ?>;
 if (Math.abs(ctmst-stmst)><?php echo $mxcstimediff; ?>) { var wrntst='<?php echo $msgstwarn; ?>'; var wrnten='<?php echo $msgenwarn; ?>'; } else { var wrntst=''; var wrnten=''; }
 
-<?php if ($tstc['coords']) { ?>
+<?php if ($tstc['coords'] || $logem['ccoords']) { ?>
 function goucoords(pos) {
 var ulat=pos.coords.latitude; var ulon=pos.coords.longitude;
 // alert('Coods'+': '+ulat+', '+ulon);
@@ -932,7 +942,7 @@ if ($tstc['port']) {if ($tstc['ip']) {echo ' ';}; echo '<span class="helem">'.'P
 echo "<br />\n";
 }
 
-if ($tstc['coords']) {
+if ($tstc['coords'] || $logem['ccoords']) {
 
 if ($lat==0 || $lon==0) {
 ?>
