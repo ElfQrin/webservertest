@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.9.4 r2022-04-09'; # fr2016-10-01
+$xprodver='v2.9.5 r2023-08-01'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -30,7 +30,7 @@ break;
 
 $pwd=addslashes(str_replace(array('<','>','\\','"',"'",'?','&','+'),'',strip_tags(trim($_REQUEST['pwd']))));
 # if ($pwd!='123'.'45') {die('unauthorized');} # Simple password protection
-
+# if ($_GET['pwd']!='123'.'45') {die('unauthorized');} # Simple password protection
 
 
 # Configuration
@@ -40,6 +40,12 @@ $pwd=addslashes(str_replace(array('<','>','\\','"',"'",'?','&','+'),'',strip_tag
 $xmpmode=false; # Example Mode / Test Mode. Note: it could also be invoked from a HTTP GET Request: mode=example
 
 $theme=2; # 0: None, 1: Light, 2: Dark
+# $colbordbar="#808080"; # Percent bars border color
+switch ($theme) {
+case 1: $colbordbar="#eeeeee"; break;
+case 2: $colbordbar="#111111"; break;
+default: $colbordbar="#808080"; break;
+}
 
 $oufmt=2; # Output Layout: 1: Flat (No Boxes), 2: Boxed.
 
@@ -47,7 +53,7 @@ $tserver=true; # Test the Server
 $tsts=array('host'=>true, 'ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'lastboot'=>true, 'bootid'=>false, 'sysinfohw'=>false, 'machid'=>false, 'os'=>true, 'webserversoft'=>true, 'php'=>true, 'php_gd'=>true, 'php_imagick'=>true, 'php_mbstring'=>true, 'php_sodium'=>true, 'php_mcrypt'=>false, 'db'=>true, 'ossl'=>true, 'osslphp'=>true, 'prot'=>true, 'sysloadavg'=>true, 'memspace'=>true, 'memspacebar'=>true, 'swapspace'=>true, 'swapspacebar'=>true, 'diskspace'=>true, 'diskspacebar'=>true, 'file'=>true, 'conn'=>true, 'chars'=>true, 'img'=>true, 'phpinfo'=>false, 'gentime'=>true); # Server: Test/Show Host Name, IP address, Port, Date (UTC), Date (Local), last boot / uptime, Boot ID, system load average, System Info about the hardware (Machine, Board, CPU), Machine ID, OS, Web Server Software, PHP, PHP GD, PHP Imagick (ImageMagick), PHP mbstring, PHP Sodium, PHP mcrypt [untested], DB (*SQL) server, OpenSSL, OpenSSL (PHP), protocol, memory space, memory space (bar graph), swap space, swap space (bar graph), disk space, disk space (bar graph), test file (create, write, read, delete), estabilished connections, character test, image, PHPinfo (you'd better use a light theme with this, especially with a boxed layout), page generation time.
 $shellex=true; # Enable tests that require the execution of a Linux shell command: Last Boot, Uptime, Boot ID, System Load Average, openssl [it doesn't affect PHP openssl extension], Memory, Swap, Estabilished Connections.
 $memsfmt=2; # Memory output format for the display (NOT for logs): 1: bytes, 2: human readable;
-$barsiz=300; # Bars size (in pixels)
+$barsiz='100%'; # Bars size (normally it should be set to 100% )
 
 $tclient=true; # Test the Client
 $tstc=array('ip'=>true, 'port'=>true, 'dateu'=>true, 'datel'=>true, 'coords'=>false, 'os'=>true, 'browser'=>true, 'uagent'=>false, 'note'=>true); # Client: Test/Show IP address, Port, Date (UTC), Date (Local), Geographic Coordinates (Latitude, Longitude), OS, browser, User Agent, Note (Comment). Note that information about the Client's OS and browser are gathered from the User Agent and may be forged. Notes (Comments) and Geographic Coordinates (Latitude, Longitude) are sent via HTTP header or as URL parameters.
@@ -75,7 +81,7 @@ $ttxtplain='Encryption test string - THE QUICK BROWN FOX JUMPS OVER THE LAZY DOG
 $cportnums=array(22,80,443); # Ports to test for estabilished connections
 $cportnams=array('22'=>'SSH','80'=>'HTTP','443'=>'HTTPS'); # Port Labels (Names)
 
-$logen=false; # Enable logging // it can be scripted using  wget -q -O- https://www.example.com/webservertest.php >/dev/null  or  lynx -dump https://www.example.com/webservertest.php >/dev/null
+$logen=false; # Enable logging // it can be scripted using  wget -q -O- http://www.example.com/webservertest.php >/dev/null  or  lynx -dump http://www.example.com/webservertest.php >/dev/null
 $logfile='/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; # Path and name of the log file. You can have yearly logs with '/var/log/webservertest/webservertest_'.gmdate('Y').'.log'; the destination directory must be owned or enabled to be read and written by www-data:www-data
 $logem=array('shost'=>true, 'sip'=>true, 'sport'=>false, 'sprot'=>true, 'sdateu'=>true, 'sdatel'=>true, 'slastboot'=>true, 'sbootid'=>false, 'smachid'=>false, 'sos'=>true, 'swebserversoft'=>true, 'sphp'=>true, 'sdb'=>true, 'sossl'=>true, 'sosslphp'=>true, 'ssysloadavg'=>true, 'smemt'=>true, 'smemu'=>true, 'smema'=>true, 'smemf'=>true, 'sswpt'=>true, 'sswpu'=>true, 'sswpf'=>true, 'sswpn'=>true, 'sdiskt'=>true, 'sdisku'=>true, 'sdiskf'=>true, 'sfile'=>true, 'sconn'=>true, 'cip'=>true, 'cport'=>false, 'ccoords'=>false, 'cos'=>true, 'cbrowser'=>true, 'cuagent'=>false, 'cnote'=>true, 'xprobs'=>true); # Information to include in the log file: Server IP, Server Port, Server Hostname, Server UTC Date, Server Local Date, Server OS, Server Webserver Software, PHP Version, DB (*SQL) Version, OpenSSL, OpenSSL (PHP), protocol, Total Memory, Used Memory, Available Memory, Free Memory, Total Swap Space, Used Swap Space, Free Swap Space, Swappiness, Total Disk Space, Used Disk Space, Free Disk Space, Test File Status, Estabilished Connections (Total/TCP/UDP), Client IP, Client Port, Client Geographic Coordinates (Latitude, Longitude), Client OS, Client Browser, Client User Agent, Note (Comment) Problems found.
 $memsfmtl=1; # Memory output format for logs (NOT for the display): 1: bytes, 2: human readable;
@@ -126,11 +132,11 @@ if (preg_match('/mobile/i', $user_agent)) {$browser.=' ('.'Mobile'.')';}
 return $browser;
 }
 
-function progbar($tag='div',$sl=200,$ph=5,$bord=1,$pc=array(100),$col=array("#ee0000","#00ee00","#0000ee"),$colbord="#111111") {
+function progbaropen($tag='div',$sl='100%',$bord=1,$pc=array(100),$col=array("#ee0000","#00ee00","#0000ee"),$colbord="#111111") {
 $pcn=count($pc); $coln=count($col);
 if ($pcn>0) {
 if ($coln<=0) {$col=array("#ee0000","#00ee00","#0000ee"); $coln=count($col);}
-echo '<'.$tag.' style="height:'.$ph.'px; width:'.$sl.'px; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right,';
+echo '<'.$tag.' style="width:'.$sl.'; border:'.$bord.'px solid '.$colbord.'; background:linear-gradient(to right,';
 $i2=0;
 for ($i1=0; $i1<=$pcn; ++$i1) {
 if ($i1==0) {$pos1=0;} else {$pos1=$pc[$i1-1];}
@@ -139,8 +145,13 @@ echo ' '.$col[$i2].' '.$pos1.'%, '.$col[$i2].' '.$pos2.'%';
 if ($i1<$pcn) {echo ',';}
 ++$i2; if ($i2>=$coln) {$i2=0;}
 }
-echo ');">'.'</'.$tag.'>';
+echo ');">';
+# echo '<span style="color:'.$coltxt.'">'; echo $txt; echo '</span>'; echo '</'.$tag.'>';
 }
+}
+
+function progbarclose($tag='div') {
+echo '</'.$tag.'>';
 }
 
 function xcrypt($cipher='sodium',$mode=0,$msg,$key) {
@@ -756,6 +767,10 @@ $memtot=hrsize($memspca[0]*1024); $memusd=hrsize($memspca[1]*1024); $memfre=hrsi
 $memtot=$memspca[0]*1024; $memusd=$memspca[1]*1024; $memfre=$memspca[2]*1024; $memsha=$memspca[3]*1024; $membuf=$memspca[4]*1024; $memcac=$memspca[5]*1024; $memavl=$memspca[6]*1024; $memunavl=$memspca[0]*1024-$memspca[6]*1024;
 }
 
+if ($tsts['swapspacebar']) {
+progbaropen('div',$barsiz,1,array(floor($memusdp),floor($memusdp+$membufp),floor($memusdp+$membufp+$memcacp)),array("#dd4499","#aa6600","#cc8811","#00bb00"),$colbordbar);
+}
+
 if ($tsts['memspace']) {
 echo '<span class="helem">'.'Memory'.'</span>'.': ';
 echo '<span class="helem2">'.'Tot'.'</span>'.': '.$memtot.', ';
@@ -769,11 +784,15 @@ echo '<span class="helem2">'.'Shared'.'</span>'.': '.$memsha;
 echo ' -->';
 echo '.';
 echo "<br />\n";
+} elseif ($tsts['memspacebar']) {echo '<br />';}
+
+if ($tsts['memspacebar']) {
+progbarclose('div');
+# echo "<br />\n";
 }
 
 if ($tsts['memspacebar']) {
-progbar('div',$barsiz,3,1,array(floor($memusdp),floor($memusdp+$membufp),floor($memusdp+$membufp+$memcacp)),array("#ee55aa","#bb7711","#dd9933","#00ff00"),"#111111");
-# echo "<br />\n";
+progbaropen('div',$barsiz,1,array(floor(100-$memavlp)),array("#dd4499","#00bb00"),$colbordbar);
 }
 
 if ($tsts['memspace']) {
@@ -782,10 +801,10 @@ echo '<span class="helem2">'.'Tot'.'</span>'.': '.$memtot.', ';
 echo '<span class="helem2">'.'Unavail'.'</span>'.': '.$memunavl.' ('.$memunavlp.'%'.')'.', ';
 echo '<span class="helem2">'.'Avail'.'</span>'.': '.$memavl.' ('.$memavlp.'%'.')'.'.';
 echo "<br />\n";
-}
+} elseif ($tsts['memspacebar']) {echo '<br />';}
 
 if ($tsts['memspacebar']) {
-progbar('div',$barsiz,3,1,array(floor(100-$memavlp)),array("#ee55aa","#00ff00"),"#111111");
+progbarclose('div');
 # echo "<br />\n";
 }
 
@@ -813,6 +832,10 @@ $swptot=hrsize($swpspca[1]); $swpusd=hrsize($swpspca[2]); $swpfre=hrsize($swpspc
 $swptot=$swpspca[1]; $swpusd=$swpspca[2]; $swpfre=$swpspca[1]-$swpspca[2];
 }
 
+if ($tsts['swapspacebar']) {
+progbaropen('div',$barsiz,1,array(floor($swpusdp)),array("#dd4499","#00bb00"),$colbordbar);
+}
+
 if ($tsts['swapspace']) {
 echo '<span class="helem">'.'Swap'.'</span>'.': ';
 # echo '<span class="helem2">'.'Name'.'</span>'.': '.$swpnam.', ';
@@ -821,10 +844,10 @@ echo '<span class="helem2">'.'Used'.'</span>'.': '.$swpusd.' ('.$swpusdp.'%'.')'
 echo '<span class="helem2">'.'Free'.'</span>'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'; ';
 echo '<span class="helem2">'.'Swappiness'.'</span>'.': '.$swppiness.'%';
 echo "<br />\n";
-}
+} elseif ($tsts['swapspacebar']) {echo '<br />';}
 
 if ($tsts['swapspacebar']) {
-progbar('div',$barsiz,3,1,array(floor($swpusdp)),array("#ee55aa","#00ff00"),"#111111");
+progbarclose('div');
 # echo "<br />\n";
 }
 
@@ -848,6 +871,10 @@ $du=$ds-$df; $duo=$du;
 if ($memsfmt==2) {$ds=hrsize($ds); $df=hrsize($df); $du=hrsize($du);}
 }
 
+if ($tsts['diskspacebar']) {
+progbaropen('div',$barsiz,1,array(floor($dup)),array("#dd4499","#00bb00"),$colbordbar);
+}
+
 if ($tsts['diskspace']) {
 echo '<span class="helem">'.'Disk'.'</span>'.': ';
 echo '<span class="helem2">'.'Tot'.'</span>'.': '.$ds.', ';
@@ -857,10 +884,10 @@ echo '<span class="helem2">'.'Free'.'</span>'.': '.$df.' ('.$dfp.'%'.')';
 if ($dfo<$ldf) {echo $msgenwarn; ++$sysok;}
 echo '.';
 echo "<br />\n";
-}
+} elseif ($tsts['diskspacebar']) {echo '<br />';}
 
 if ($tsts['diskspacebar']) {
-progbar('div',$barsiz,3,1,array(floor($dup)),array("#ee55aa","#00ff00"),"#111111");
+progbarclose('div');
 # echo "<br />\n";
 }
 
