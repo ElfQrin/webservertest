@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.9.5 r2023-08-01'; # fr2016-10-01
+$xprodver='v2.9.6 r2023-08-11'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -154,7 +154,7 @@ function progbarclose($tag='div') {
 echo '</'.$tag.'>';
 }
 
-function xcrypt($cipher='sodium',$mode=0,$msg,$key) {
+function xcrypt($cipher='sodium',$mode=0,$msg='',$key='') {
 $cipher=strtolower(trim($cipher));
 $r='';
 switch ($cipher) {
