@@ -326,6 +326,8 @@ h1 {display: block; font-size: 1.1em; margin-top: 1%; margin-bottom: 1%; margin-
 h2 {display: block; font-size: 1.05em; margin-top: 1%; margin-bottom: 1%; margin-left: 0; margin-right: 0; font-weight: bold;}
 .helem { font-weight: bold; }
 .helem2 { font-weight: bold; font-style: italic; }
+.helembar { font-weight: bold; text-shadow: 1px 1px 2px #000000; }
+.helembar2 { font-weight: bold; font-style: italic; text-shadow: 1px 1px 2px #000000; }
 .txtinbar { text-shadow: 1px 1px 2px #000000; }
 .txtsml {font-size: 70%;}
 .prodver {font-size: 70%;}
