@@ -2,7 +2,7 @@
 $page_start_time=microtime(true);
 # Web Server Test
 # By Valerio Capello (Elf Qrin) - https://labs.geody.com/
-$xprodver='v2.9.7 r2023-09-25'; # fr2016-10-01
+$xprodver='v2.9.8 r2023-10-23'; # fr2016-10-01
 
 # die(); # die unconditionately, locking out any access
 
@@ -326,6 +326,7 @@ h1 {display: block; font-size: 1.1em; margin-top: 1%; margin-bottom: 1%; margin-
 h2 {display: block; font-size: 1.05em; margin-top: 1%; margin-bottom: 1%; margin-left: 0; margin-right: 0; font-weight: bold;}
 .helem { font-weight: bold; }
 .helem2 { font-weight: bold; font-style: italic; }
+.txtinbar { text-shadow: 1px 1px 2px #000000; }
 .txtsml {font-size: 70%;}
 .prodver {font-size: 70%;}
 .section {margin-top: 2px; margin-bottom: 5px;}
@@ -773,17 +774,19 @@ progbaropen('div',$barsiz,1,array(floor($memusdp),floor($memusdp+$membufp),floor
 }
 
 if ($tsts['memspace']) {
-echo '<span class="helem">'.'Memory'.'</span>'.': ';
-echo '<span class="helem2">'.'Tot'.'</span>'.': '.$memtot.', ';
-echo '<span class="helem2">'.'Used'.'</span>'.': '.$memusd.' ('.$memusdp.'%'.')'.', '; echo "<br />";
-echo '<span class="helem2">'.'Buffers'.'</span>'.': '.$membuf.' ('.$membufp.'%'.')'.', ';
-echo '<span class="helem2">'.'Cache'.'</span>'.': '.$memcac.' ('.$memcacp.'%'.')'.', ';
-echo '<span class="helem2">'.'Free'.'</span>'.': '.$memfre.' ('.$memfrep.'%'.')';
+echo '<span class="txtinbar">';
+echo '<span class="helembar">'.'Memory'.'</span>'.': ';
+echo '<span class="helembar2">'.'Tot'.'</span>'.': '.$memtot.', ';
+echo '<span class="helembar2">'.'Used'.'</span>'.': '.$memusd.' ('.$memusdp.'%'.')'.', '; echo "<br />";
+echo '<span class="helembar2">'.'Buffers'.'</span>'.': '.$membuf.' ('.$membufp.'%'.')'.', ';
+echo '<span class="helembar2">'.'Cache'.'</span>'.': '.$memcac.' ('.$memcacp.'%'.')'.', ';
+echo '<span class="helembar2">'.'Free'.'</span>'.': '.$memfre.' ('.$memfrep.'%'.')';
 echo '<!-- ';
 echo '; ';
-echo '<span class="helem2">'.'Shared'.'</span>'.': '.$memsha;
+echo '<span class="helembar2">'.'Shared'.'</span>'.': '.$memsha;
 echo ' -->';
 echo '.';
+echo '</span>';
 echo "<br />\n";
 } elseif ($tsts['memspacebar']) {echo '<br />';}
 
@@ -799,10 +802,12 @@ progbaropen('div',$barsiz,1,array(floor(100-$memavlp)),array("#dd4499","#00bb00"
 }
 
 if ($tsts['memspace']) {
-echo '<span class="helem">'.'Memory'.'</span>'.': ';
-echo '<span class="helem2">'.'Tot'.'</span>'.': '.$memtot.', ';
-echo '<span class="helem2">'.'Unavail'.'</span>'.': '.$memunavl.' ('.$memunavlp.'%'.')'.', ';
-echo '<span class="helem2">'.'Avail'.'</span>'.': '.$memavl.' ('.$memavlp.'%'.')'.'.';
+echo '<span class="txtinbar">';
+echo '<span class="helembar">'.'Memory'.'</span>'.': ';
+echo '<span class="helembar2">'.'Tot'.'</span>'.': '.$memtot.', ';
+echo '<span class="helembar2">'.'Unavail'.'</span>'.': '.$memunavl.' ('.$memunavlp.'%'.')'.', ';
+echo '<span class="helembar2">'.'Avail'.'</span>'.': '.$memavl.' ('.$memavlp.'%'.')'.'.';
+echo '</span>';
 echo "<br />\n";
 } elseif ($tsts['memspacebar']) {echo '<br />';}
 
@@ -842,12 +847,14 @@ progbaropen('div',$barsiz,1,array(floor($swpusdp)),array("#dd4499","#00bb00"),$c
 }
 
 if ($tsts['swapspace']) {
-echo '<span class="helem">'.'Swap'.'</span>'.': ';
-# echo '<span class="helem2">'.'Name'.'</span>'.': '.$swpnam.', ';
-echo '<span class="helem2">'.'Tot'.'</span>'.': '.$swptot.', ';
-echo '<span class="helem2">'.'Used'.'</span>'.': '.$swpusd.' ('.$swpusdp.'%'.')'.', ';
-echo '<span class="helem2">'.'Free'.'</span>'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'; ';
-echo '<span class="helem2">'.'Swappiness'.'</span>'.': '.$swppiness.'%';
+echo '<span class="txtinbar">';
+echo '<span class="helembar">'.'Swap'.'</span>'.': ';
+# echo '<span class="helembar2">'.'Name'.'</span>'.': '.$swpnam.', ';
+echo '<span class="helembar2">'.'Tot'.'</span>'.': '.$swptot.', ';
+echo '<span class="helembar2">'.'Used'.'</span>'.': '.$swpusd.' ('.$swpusdp.'%'.')'.', ';
+echo '<span class="helembar2">'.'Free'.'</span>'.': '.$swpfre.' ('.$swpfrep.'%'.')'.'; ';
+echo '<span class="helembar2">'.'Swappiness'.'</span>'.': '.$swppiness.'%';
+echo '</span>';
 echo "<br />\n";
 } elseif ($tsts['swapspacebar']) {echo '<br />';}
 
@@ -881,13 +888,15 @@ progbaropen('div',$barsiz,1,array(floor($dup)),array("#dd4499","#00bb00"),$colbo
 }
 
 if ($tsts['diskspace']) {
-echo '<span class="helem">'.'Disk'.'</span>'.': ';
-echo '<span class="helem2">'.'Tot'.'</span>'.': '.$ds.', ';
-echo '<span class="helem2">'.'Used'.'</span>'.': '.$du.' ('.$dup.'%'.')'.', ';
+echo '<span class="txtinbar">';
+echo '<span class="helembar">'.'Disk'.'</span>'.': ';
+echo '<span class="helembar2">'.'Tot'.'</span>'.': '.$ds.', ';
+echo '<span class="helembar2">'.'Used'.'</span>'.': '.$du.' ('.$dup.'%'.')'.', ';
 if ($dfo<$ldf) {echo $msgstwarn;}
-echo '<span class="helem2">'.'Free'.'</span>'.': '.$df.' ('.$dfp.'%'.')';
+echo '<span class="helembar2">'.'Free'.'</span>'.': '.$df.' ('.$dfp.'%'.')';
 if ($dfo<$ldf) {echo $msgenwarn; ++$sysok;}
 echo '.';
+echo '</span>';
 echo "<br />\n";
 } elseif ($tsts['diskspacebar']) {echo '<br />';}
 
